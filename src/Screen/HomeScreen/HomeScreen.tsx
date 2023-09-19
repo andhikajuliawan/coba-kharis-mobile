@@ -5,8 +5,8 @@
  * @format
  */
 
-import React, {useState, useEffect} from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState, useEffect } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import {
   ScrollView,
@@ -15,9 +15,10 @@ import {
   ImageBackground,
   Image,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
-import {ScaledSheet} from 'react-native-size-matters';
-import {scale} from 'react-native-size-matters';
+import { ScaledSheet } from 'react-native-size-matters';
+import { scale } from 'react-native-size-matters';
 
 // SVG
 import ArrowButton from '../../../assets/icons/Home/ArrowButton.svg';
@@ -26,13 +27,16 @@ import ArrowVButton from '../../../assets/icons/Home/ArrowVButton.svg';
 // Component
 import Header from '../../Component/Header';
 import YoutubeThumbnail from '../../Component/Home/Thumbnail';
+import axios from 'axios';
+import { BASE_URL } from '../../config';
+import { useNavigation } from '@react-navigation/native';
 
 type SectionProps = PropsWithChildren<{
   text: string;
   limit: number;
 }>;
 
-const LimitText = ({text, limit}: SectionProps) => {
+const LimitText = ({ text, limit }: SectionProps) => {
   const panjangText =
     text.length > limit ? text.substring(0, limit) + '...' : text;
 
@@ -40,49 +44,53 @@ const LimitText = ({text, limit}: SectionProps) => {
 };
 
 const HomeScreen = () => {
+  // Navigation init
+  const navigation = useNavigation();
+
   // State untuk informasi user
   const [userInfo] = useState({
     name: 'Pdt. Nyoman Widiantara',
   });
-
   // Menu dinamis diambil dari banyaknya event
-  const [menu, setMenu] = useState([
-    {
-      id: 2,
-      logo: require('../../../assets/icons/Home/Menu/Menu_2.png'),
-      title: 'Godly Family',
-    },
-    {
-      id: 3,
-      logo: require('../../../assets/icons/Home/Menu/Menu_3.png'),
-      title: 'Marriage Enrichment',
-    },
-    {
-      id: 4,
-      logo: require('../../../assets/icons/Home/Menu/Menu_4.png'),
-      title: 'Growing Couple',
-    },
-    {
-      id: 5,
-      logo: require('../../../assets/icons/Home/Menu/Menu_5.png'),
-      title: 'Marriage Spiritual Transformation Class',
-    },
-    {
-      id: 6,
-      logo: require('../../../assets/icons/Home/Menu/Menu_6.png'),
-      title: 'Pre Marital Class',
-    },
-    {
-      id: 7,
-      logo: require('../../../assets/icons/Home/Menu/Menu_7.png'),
-      title: 'Shining Generation Class',
-    },
-    {
-      id: 8,
-      logo: require('../../../assets/icons/Home/Menu/Menu_16.png'),
-      title: 'Wisdom For Family',
-    },
-  ]);
+  const [menu, setMenu] = useState([]);
+  // const [menu, setMenu] = useState([
+  //   {
+  //     id: 2,
+  //     logo: require('../../../assets/icons/Home/Menu/Menu_2.png'),
+  //     title: 'Godly Family',
+  //   },
+  //   {
+  //     id: 3,
+  //     logo: require('../../../assets/icons/Home/Menu/Menu_3.png'),
+  //     title: 'Marriage Enrichment',
+  //   },
+  //   {
+  //     id: 4,
+  //     logo: require('../../../assets/icons/Home/Menu/Menu_4.png'),
+  //     title: 'Growing Couple',
+  //   },
+  //   {
+  //     id: 5,
+  //     logo: require('../../../assets/icons/Home/Menu/Menu_5.png'),
+  //     title: 'Marriage Spiritual Transformation Class',
+  //   },
+  //   {
+  //     id: 6,
+  //     logo: require('../../../assets/icons/Home/Menu/Menu_6.png'),
+  //     title: 'Pre Marital Class',
+  //   },
+  //   {
+  //     id: 7,
+  //     logo: require('../../../assets/icons/Home/Menu/Menu_7.png'),
+  //     title: 'Shining Generation Class',
+  //   },
+  //   {
+  //     id: 8,
+  //     logo: require('../../../assets/icons/Home/Menu/Menu_16.png'),
+  //     title: 'Wisdom For Family',
+  //   }
+  // ]);
+
 
   const jmlMenuDinamis = menu.length;
   const [jmlMenuStatis, setJmlMenuStatis] = useState<any | null>(null);
@@ -212,6 +220,18 @@ const HomeScreen = () => {
     setShowMenu(!showMenu);
   };
 
+  const getCategories = () => {
+    axios.get(`${BASE_URL}/event-categories`)
+      .then((response) => {
+        let menu = response.data.categories;
+        setMenu(menu)
+      })
+      .then(() => console.log(menu))
+      .catch((err) => {
+        console.log(err);
+      })
+  };
+
   // UseEffect
   useEffect(() => {
     if (jmlMenuDinamis <= 9) {
@@ -221,8 +241,19 @@ const HomeScreen = () => {
       const menuStatis = 0;
       setJmlMenuStatis(menuStatis);
     }
-    return () => {};
+
+    getCategories();
+    return () => { };
   }, [jmlMenuDinamis]);
+
+  // Mendapatkan luas layar
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+
+  const onPressKategori = (kategori) => {
+    navigation.navigate('EventList', { kategori: kategori });
+    console.log('hai');
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -291,9 +322,9 @@ const HomeScreen = () => {
           style={
             showMenu
               ? [
-                  {maxHeight: scale(90 * Math.ceil((jmlMenuDinamis + 8) / 5))},
-                  styles.containerMenuShow,
-                ]
+                { maxHeight: scale(90 * Math.ceil((jmlMenuDinamis + 8) / 5)) },
+                styles.containerMenuShow,
+              ]
               : styles.containerMenuHide
           }>
           {/* Menu 1 */}
@@ -307,8 +338,8 @@ const HomeScreen = () => {
               source={require('../../../assets/icons/Home/Menu/Menu_1.png')}
               resizeMode="contain"
               style={{
-                maxHeight: scale(56),
-                maxWidth: scale(56),
+                width: windowWidth * (20 / 100),
+                height: windowHeight * (7 / 100)
               }}
             />
             <Text style={styles.menuTitle}>Tentang Kharis</Text>
@@ -318,23 +349,27 @@ const HomeScreen = () => {
           {showMenu ? (
             <>
               {/* Menu Dinamis */}
-              {menu.map((image, index) => (
+              {menu.map((kategori, index) => (
                 <TouchableOpacity
+                  onPress={() => onPressKategori(kategori)}
                   style={{
                     alignItems: 'center',
                     width: scale(64),
                     marginBottom: scale(10),
                   }}
                   key={index}>
+
+                  {/* Percobaan Fetch */}
                   <Image
-                    source={image.logo}
-                    resizeMode="contain"
+                    source={{
+                      uri: `http://192.168.1.4:8001/storage/files/event-categorie/${kategori.icon}`,
+                    }} resizeMode="contain"
                     style={{
-                      maxHeight: scale(56),
-                      maxWidth: scale(56),
+                      width: windowWidth * (20 / 100),
+                      height: windowHeight * (7 / 100)
                     }}
                   />
-                  <LimitText text={image.title} limit={19} />
+                  <LimitText text={kategori.nama} limit={19} />
                 </TouchableOpacity>
               ))}
 
@@ -351,8 +386,8 @@ const HomeScreen = () => {
                     source={imageStatis.logo}
                     resizeMode="contain"
                     style={{
-                      maxHeight: scale(56),
-                      maxWidth: scale(56),
+                      width: windowWidth * (20 / 100),
+                      height: windowHeight * (7 / 100)
                     }}
                   />
                   <LimitText text={imageStatis.title} limit={19} />
@@ -372,14 +407,16 @@ const HomeScreen = () => {
                   }}
                   key={index}>
                   <Image
-                    source={image.logo}
+                    source={{
+                      uri: `http://192.168.1.4:8001/storage/files/event-categorie/${image.icon}`,
+                    }}
                     resizeMode="contain"
                     style={{
-                      maxHeight: scale(56),
-                      maxWidth: scale(56),
+                      width: windowWidth * (20 / 100),
+                      height: windowHeight * (7 / 100)
                     }}
                   />
-                  <LimitText text={image.title} limit={19} />
+                  <LimitText text={image.nama} limit={19} />
                 </TouchableOpacity>
               ))}
 
@@ -396,8 +433,8 @@ const HomeScreen = () => {
                     source={imageStatis.logo}
                     resizeMode="contain"
                     style={{
-                      maxHeight: scale(56),
-                      maxWidth: scale(56),
+                      width: windowWidth * (20 / 100),
+                      height: windowHeight * (7 / 100)
                     }}
                   />
                   <LimitText text={imageStatis.title} limit={19} />
@@ -453,10 +490,10 @@ const HomeScreen = () => {
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        style={{marginVertical: scale(15), paddingHorizontal: scale(15)}}>
+        style={{ marginVertical: scale(15), paddingHorizontal: scale(15) }}>
         {/* FAMILY */}
         <View
-          style={{flexDirection: 'row', height: 'auto', marginRight: scale(5)}}>
+          style={{ flexDirection: 'row', height: 'auto', marginRight: scale(5) }}>
           <View
             style={{
               height: scale(240),
@@ -488,10 +525,10 @@ const HomeScreen = () => {
                 paddingBottom: scale(7),
                 paddingHorizontal: scale(15),
               }}>
-              <Text style={[{color: '#502C0D'}, styles.headerGroup]}>
+              <Text style={[{ color: '#502C0D' }, styles.headerGroup]}>
                 God’s Will in
               </Text>
-              <Text style={[{color: '#502C0D'}, styles.group]}>FAMILY</Text>
+              <Text style={[{ color: '#502C0D' }, styles.group]}>FAMILY</Text>
               <Text style={styles.groupDetail}>
                 Temukan visi Allah untuk membangun keluarga terang
               </Text>
@@ -551,10 +588,10 @@ const HomeScreen = () => {
                 paddingBottom: scale(7),
                 paddingHorizontal: scale(15),
               }}>
-              <Text style={[{color: '#A4161A'}, styles.headerGroup]}>
+              <Text style={[{ color: '#A4161A' }, styles.headerGroup]}>
                 God’s Love in
               </Text>
-              <Text style={[{color: '#A4161A'}, styles.group]}>MARRIAGE</Text>
+              <Text style={[{ color: '#A4161A' }, styles.group]}>MARRIAGE</Text>
               <Text style={styles.groupDetail}>
                 Jelajahi keindahan pernikahan dengan kasih Allah
               </Text>
@@ -614,10 +651,10 @@ const HomeScreen = () => {
                 paddingBottom: scale(7),
                 paddingHorizontal: scale(15),
               }}>
-              <Text style={[{color: '#00528C'}, styles.headerGroup]}>
+              <Text style={[{ color: '#00528C' }, styles.headerGroup]}>
                 God’s Vision Before
               </Text>
-              <Text style={[{color: '#00528C'}, styles.group]}>WEDDDING</Text>
+              <Text style={[{ color: '#00528C' }, styles.group]}>WEDDDING</Text>
               <Text style={styles.groupDetail}>
                 Kenali visi Allah sebelum memasuki pernikahan kudus
               </Text>
@@ -677,10 +714,10 @@ const HomeScreen = () => {
                 paddingBottom: scale(7),
                 paddingHorizontal: scale(15),
               }}>
-              <Text style={[{color: '#347361'}, styles.headerGroup]}>
+              <Text style={[{ color: '#347361' }, styles.headerGroup]}>
                 God’s Wisdom as
               </Text>
-              <Text style={[{color: '#347361'}, styles.group]}>PARENTS</Text>
+              <Text style={[{ color: '#347361' }, styles.group]}>PARENTS</Text>
               <Text style={styles.groupDetail}>
                 Terapkan hikmat dari Tuhan untuk mendidik generasi muda
               </Text>
@@ -740,10 +777,10 @@ const HomeScreen = () => {
                 paddingBottom: scale(7),
                 paddingHorizontal: scale(15),
               }}>
-              <Text style={[{color: '#D97A07'}, styles.headerGroup]}>
+              <Text style={[{ color: '#D97A07' }, styles.headerGroup]}>
                 God’s Vigil in
               </Text>
-              <Text style={[{color: '#D97A07'}, styles.group]}>YOUTH GEN</Text>
+              <Text style={[{ color: '#D97A07' }, styles.group]}>YOUTH GEN</Text>
               <Text style={styles.groupDetail}>
                 Pesan Tuhan bagi generasi muda dalam membangun hubungan
               </Text>
@@ -786,7 +823,7 @@ const HomeScreen = () => {
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        style={{marginVertical: scale(15), paddingHorizontal: scale(15)}}>
+        style={{ marginVertical: scale(15), paddingHorizontal: scale(15) }}>
         {recomEvent.map((imageEvent, index) => (
           <>
             <TouchableOpacity
@@ -809,7 +846,7 @@ const HomeScreen = () => {
             </TouchableOpacity>
           </>
         ))}
-        <View style={{marginRight: scale(15)}}></View>
+        <View style={{ marginRight: scale(15) }}></View>
       </ScrollView>
     </ScrollView>
   );

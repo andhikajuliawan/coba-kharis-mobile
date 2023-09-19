@@ -38,6 +38,8 @@ import KegiatanScreen from '../Screen/KegiatanScreen';
 import MitraKharisScreen from '../Screen/MitraKharisScreen';
 import PelayananScreen from '../Screen/PelayananScreen';
 import StreamingScreen from '../Screen/StreamingScreen';
+import EventListScreen from '../Screen/EventListScreen';
+
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
@@ -46,21 +48,25 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
-  const [HideSplash, setHideSplash] = useState(false);
+  const [HideSplash, setHideSplash] = useState(true);
 
   useEffect(() => {
     setTimeout(() => {
-      setHideSplash(true);
-    }, 5000);
+      // setHideSplash(true);
+      setHideSplash(false);
+    }, 1000);
   }, []);
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {HideSplash ? (
-          <Stack.Screen name="Home" component={Tabs} />
-        ) : (
           <Stack.Screen name="Home" component={SplashScreen} />
+        ) : (
+          <>
+            <Stack.Screen name="Home" component={Tabs} />
+            <Stack.Screen name="EventList" component={EventListScreen} />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
