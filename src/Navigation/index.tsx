@@ -39,6 +39,10 @@ import MitraKharisScreen from '../Screen/MitraKharisScreen';
 import PelayananScreen from '../Screen/PelayananScreen';
 import StreamingScreen from '../Screen/StreamingScreen';
 import EventListScreen from '../Screen/EventListScreen';
+import DetailEventListScreen from '../Screen/DetailEventListScreen';
+import DetailEventScreen from '../Screen/DetailEventScreen';
+
+
 
 
 import { ScaledSheet } from 'react-native-size-matters';
@@ -66,6 +70,8 @@ const Navigation = () => {
           <>
             <Stack.Screen name="Home" component={Tabs} />
             <Stack.Screen name="EventList" component={EventListScreen} />
+            <Stack.Screen name="DetailEventList" component={DetailEventListScreen} />
+            <Stack.Screen name="DetailEvent" component={DetailEventScreen} />
           </>
         )}
       </Stack.Navigator>

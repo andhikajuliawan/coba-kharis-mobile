@@ -9,9 +9,15 @@ import React from 'react';
 
 // Navigation
 import Navigation from './src/Navigation/index';
+import { NativeBaseProvider } from 'native-base';
 
 const App = () => {
-  return <Navigation />;
+  return (<NativeBaseProvider>
+    <Navigation />
+  </NativeBaseProvider>)
+
+
+
 };
 
 export default App;

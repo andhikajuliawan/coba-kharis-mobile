@@ -252,7 +252,6 @@ const HomeScreen = () => {
 
   const onPressKategori = (kategori) => {
     navigation.navigate('EventList', { kategori: kategori });
-    console.log('hai');
   }
 
   return (
@@ -362,7 +361,7 @@ const HomeScreen = () => {
                   {/* Percobaan Fetch */}
                   <Image
                     source={{
-                      uri: `http://192.168.1.4:8001/storage/files/event-categorie/${kategori.icon}`,
+                      uri: `http://192.168.1.11:8000/storage/files/event-categorie/${kategori.icon}`,
                     }} resizeMode="contain"
                     style={{
                       width: windowWidth * (20 / 100),
@@ -400,6 +399,8 @@ const HomeScreen = () => {
               {/* Menu Dinamis */}
               {menu.slice(0, 9).map((image, index) => (
                 <TouchableOpacity
+                  onPress={() => onPressKategori(image)}
+
                   style={{
                     alignItems: 'center',
                     width: scale(64),
@@ -408,7 +409,7 @@ const HomeScreen = () => {
                   key={index}>
                   <Image
                     source={{
-                      uri: `http://192.168.1.4:8001/storage/files/event-categorie/${image.icon}`,
+                      uri: `http://192.168.1.11:8000/storage/files/event-categorie/${image.icon}`,
                     }}
                     resizeMode="contain"
                     style={{
