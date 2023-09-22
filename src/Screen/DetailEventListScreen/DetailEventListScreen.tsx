@@ -1,5 +1,5 @@
 import { Box, Flex, Image, ScrollView, Spinner, Text } from "native-base";
-import Header from "../../Component/EventList/Header";
+import Header from "../../Component/DetailEventList/Header";
 import axios from "axios";
 import { BASE_URL } from "../../config";
 import { useEffect, useState } from "react";
@@ -15,17 +15,11 @@ const DetailtEventListScreen = ({ route }) => {
     const getListEvent = () => {
         axios
             .get(
-                `${BASE_URL}/event/kategori/${route.params.kategori}/online/${route.params.jenis}`,
+                `${BASE_URL}/event/kategori/${route.params.kategori}/status/${route.params.status}`,
             )
             .then(response => response.data)
             .then(data => {
-                if (route.params.jenis == 'onsite') {
-                    setListEvent(data.data)
-                } if (route.params.jenis == 'online') {
-                    setListEvent(data.data)
-                } if (route.params.jenis == 'hybrid') {
-                    setListEvent(data.data)
-                }
+                setListEvent(data.data)
             })
             .catch(err => {
                 console.log(err);

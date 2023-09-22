@@ -18,11 +18,11 @@ import Money from '../../../assets/icons/EventDetail/giftcard.svg'
 
 
 const DetailtEventScreen = ({ route }) => {
-    const [eventList, setEventList] = useState([]);
+    const [eventDetail, setEventDetail] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
-
+    const [date, setDate] = useState('');
 
     const getDetailEvent = () => {
         axios
@@ -31,13 +31,14 @@ const DetailtEventScreen = ({ route }) => {
             )
             .then(response => response.data)
             .then(data => {
-                setEventList(data.event_detail);
+                setEventDetail(data.event_detail);
                 // console.log(data.event_detail);
-
             })
+
             .then(() => {
-                setLatitude(parseFloat(eventList.lat));
-                setLongitude(parseFloat(eventList.lng));
+                setLatitude(parseFloat(eventDetail.lat));
+                setLongitude(parseFloat(eventDetail.lng));
+
             })
             .catch(err => {
                 console.log(err);
@@ -49,19 +50,72 @@ const DetailtEventScreen = ({ route }) => {
 
     useEffect(() => {
         getDetailEvent();
+
     }, [])
 
     const description = {
         html: `
-      ${eventList.deskripsi}`
+          ${eventDetail.deskripsi}`
     };
+
     const { width } = useWindowDimensions();
     // Mendapatkan luas layar
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
 
-    // $date = eventList.split('-', '', $date);
-    // console.log(date('Y-m-d', strtotime($date)));
+
+    if (eventDetail.tanggal_mulai != null) {
+        let tanggal_mulai = eventDetail.tanggal_mulai.split(' ');
+        let tanggal_selesai = eventDetail.tanggal_selesai.split(' ');
+        let split_tanggal_mulai = tanggal_mulai[0].split('-');
+        let split_tanggal_selesai = tanggal_selesai[0].split('-');
+        let tanggal1 = split_tanggal_mulai[2]
+        let tanggal2 = split_tanggal_selesai[2]
+        let tahun = split_tanggal_mulai[0]
+        let bulan = ''
+        // if (split_tanggal_mulai[1] == 1) {
+        //     bulan = 'januari'
+        // }
+        // if (split_tanggal_mulai[1] == 2) {
+        //     bulan = 'februari'
+        // }
+        // if (split_tanggal_mulai[1] == 3) {
+        //     bulan = 'maret'
+        // }
+        // if (split_tanggal_mulai[1] == 4) {
+        //     bulan = 'april'
+        // }
+        // if (split_tanggal_mulai[1] == 5) {
+        //     bulan = 'mei'
+        // }
+        // if (split_tanggal_mulai[1] == 6) {
+        //     bulan = 'juni'
+        // }
+        // if (split_tanggal_mulai[1] == 7) {
+        //     bulan = 'juli'
+        // }
+        // if (split_tanggal_mulai[1] == 8) {
+        //     bulan = 'agustus'
+        // }
+        // if (split_tanggal_mulai[1] == 9) {
+        //     bulan = 'september'
+        // }
+        // if (split_tanggal_mulai[1] == 10) {
+        //     bulan = 'oktober'
+        // }
+        // if (split_tanggal_mulai[1] == 11) {
+        //     bulan = 'november'
+        // }
+        // if (split_tanggal_mulai[1] == 12) {
+        //     bulan = 'desember'
+        // }
+        let hasil = tanggal1 + ' - ' + tanggal2 + ' ' + bulan + ' ' + tahun;
+
+
+
+    }
+
+
 
     return (
         <ScrollView bgColor="#fff">
@@ -69,24 +123,23 @@ const DetailtEventScreen = ({ route }) => {
                 <Box zIndex={2} >
                     <Header />
                 </Box>
-                {isLoading ? <Spinner /> : eventList.event_media[0].jenis == 'image' ?
+                {isLoading ? <Spinner /> : eventDetail.event_media[0].jenis == 'image' ?
                     <ImageBackground
-                        source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${eventList.event_media[0].file}` }}
+                        source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${eventDetail.event_media[0].file}` }}
                         resizeMode="cover"
                         style={styles.image} /> :
                     <ImageBackground
-                        source={{ uri: `${eventList.event_media[0].thumbnail}` }}
+                        source={{ uri: `${eventDetail.event_media[0].thumbnail}` }}
                         resizeMode="cover"
                         style={styles.image}
                     />}
                 <ImageBackground source={require('../../../assets/bg/gradientTitle.png')}
                     resizeMode="cover" >
-                    <Box mx={5} my={3} >
-                        <Text fontSize={24} fontWeight="bold" mb={1}>{eventList.nama}</Text>
-
+                    <Box px={5} my={3} borderTopRadius={20} mt={-10} zIndex={1} bgColor="#fff">
+                        <Text fontSize={24} fontWeight="bold" mb={1} mt={5}>{eventDetail.nama}</Text>
                         <HStack alignItems="center" >
                             <Date width={scale(24)} height={scale(24)} />
-                            <Text ml={1} fontSize={16} mb={1} >{eventList.tanggal_mulai}</Text>
+                            <Text ml={1} fontSize={16} mb={1} >{date}</Text>
                         </HStack>
                         <HStack alignItems="center" >
                             <Location width={scale(24)} height={scale(24)} />
@@ -95,11 +148,11 @@ const DetailtEventScreen = ({ route }) => {
                         <HStack justifyContent="space-between" >
                             <HStack>
                                 <Person width={scale(24)} height={scale(24)} />
-                                <Text ml={1} fontSize={16} >{eventList.maksimal_peserta} Pasang</Text>
+                                <Text ml={1} fontSize={16} >{eventDetail.maksimal_peserta} Pasang</Text>
                             </HStack>
                             <HStack>
                                 <Money width={scale(24)} height={scale(24)} />
-                                <Text ml={1} fontSize={16}>Rp.{eventList.harga}</Text>
+                                <Text ml={1} fontSize={16}>Rp.{eventDetail.harga}</Text>
                             </HStack>
 
                         </HStack>
@@ -110,27 +163,34 @@ const DetailtEventScreen = ({ route }) => {
                         <HStack my={3}>
                             {isLoading ?
                                 <Spinner /> :
-                                eventList.event_media.map((item, index) =>
+                                eventDetail.event_media.map((item, index) =>
                                 (
                                     item.jenis == 'image' ?
                                         <Image source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${item.file}` }}
-                                            alt="Alternate Text" size="xl" borderRadius={5} mr={2} />
+                                            alt="Alternate Text" size="xl" borderRadius={5} mr={2} key={index} />
 
                                         : item.jenis == 'youtube' ?
                                             <TouchableOpacity onPress={() => { Linking.openURL(`https://youtu.be/${item.file}`) }}>
-                                                <ImageBackground source={{ uri: `${item.thumbnail}` }} alt="youtube" width={windowWidth * (50 / 100)} height={windowWidth * (30 / 100)}
-                                                    borderRadius={5} mr={2} >
-                                                    <Center width={windowWidth * (50 / 100)} height={windowWidth * (30 / 100)}>
-                                                        <Image source={require('../../../assets/logo/youtube.png')} width={windowWidth * (10 / 100)} height={windowWidth * (7 / 100)} alt="youtube" />
-                                                    </Center></ImageBackground>
+                                                <Box mr={3}>
+                                                    <ImageBackground source={{ uri: `${item.thumbnail}` }} alt="youtube" width={windowWidth * (50 / 100)} height={windowWidth * (30 / 100)}
+                                                        borderRadius={5} key={index}>
+                                                        <Center width={windowWidth * (50 / 100)} height={windowWidth * (30 / 100)} mr={2}
+                                                            mr={2}>
+                                                            <Image source={require('../../../assets/logo/youtube.png')} width={windowWidth * (10 / 100)} height={windowWidth * (7 / 100)} alt="youtube" />
+                                                        </Center>
+                                                    </ImageBackground>
+                                                </Box>
                                             </TouchableOpacity>
                                             :
-                                            <TouchableOpacity onPress={() => { Linking.openURL(`https://open.spotify.com/episode/${item.file}`) }}>
-                                                <ImageBackground source={{ uri: `${item.thumbnail}` }} alt="Alternate Text" width={windowWidth * (30 / 100)} height={windowWidth * (30 / 100)} borderRadius={5} mr={2}>
-                                                    <Center width={windowWidth * (30 / 100)} height={windowWidth * (30 / 100)}>
-                                                        <Image source={require('../../../assets/logo/spotify.png')} width={windowWidth * (7 / 100)} height={windowWidth * (7 / 100)} alt="spotify" />
-                                                    </Center>
-                                                </ImageBackground>
+                                            <TouchableOpacity onPress={() => { Linking.openURL(`https://open.spotify.com/episode/${item.file}`) }} >
+                                                <Box mr={3}>
+                                                    <ImageBackground source={{ uri: `${item.thumbnail}` }} alt="Alternate Text" width={windowWidth * (30 / 100)} height={windowWidth * (30 / 100)} borderRadius={5} key={index} >
+                                                        <Center width={windowWidth * (30 / 100)} height={windowWidth * (30 / 100)} >
+                                                            <Image source={require('../../../assets/logo/spotify.png')} width={windowWidth * (7 / 100)} height={windowWidth * (7 / 100)} alt="spotify" />
+                                                        </Center>
+                                                    </ImageBackground>
+                                                </Box>
+
                                             </TouchableOpacity>
                                 ))}
                         </HStack>
@@ -147,16 +207,16 @@ const DetailtEventScreen = ({ route }) => {
                             provider={PROVIDER_GOOGLE} // remove if not using Google Maps
                             style={{ width: '100%', height: 250, borderRadius: 50 }}
                             initialRegion={{
-                                latitude: parseFloat(eventList.lat),
-                                longitude: parseFloat(eventList.lng),
+                                latitude: parseFloat(eventDetail.lat),
+                                longitude: parseFloat(eventDetail.lng),
                                 latitudeDelta: 0.009,
                                 longitudeDelta: 0.009,
                             }}
                         >
                             <Marker
                                 coordinate={{
-                                    latitude: parseFloat(eventList.lat),
-                                    longitude: parseFloat(eventList.lng),
+                                    latitude: parseFloat(eventDetail.lat),
+                                    longitude: parseFloat(eventDetail.lng),
                                 }}
                                 title="lokasi acara"
                             />
@@ -172,7 +232,7 @@ const DetailtEventScreen = ({ route }) => {
                 </TouchableOpacity>
                 <Box m={5}>
                     <Text fontWeight="bold" color="#555F65" fontSize={16} > Ketentuan Peserta</Text>
-                    <Text color="#555F65" fontSize={16}>{eventList.ketentuan}</Text>
+                    <Text color="#555F65" fontSize={16}>{eventDetail.ketentuan}</Text>
 
                 </Box>
             </>

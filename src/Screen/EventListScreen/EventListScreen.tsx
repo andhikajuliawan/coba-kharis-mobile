@@ -26,126 +26,77 @@ const EventListScreen = ({ route }) => {
   // Navigation init
   const navigation = useNavigation();
   const [inputPencarian, setInputPencarian] = useState('');
-  const [eventByKategori, setEventByKategori] = useState([]);
-  const [eventByOnline, setEventByOnline] = useState([]);
-  const [eventByOnsite, setEventByOnsite] = useState([]);
-  const [eventByHybrid, setEventByHybrid] = useState([]);
-  const [isLoadingOnsite, setIsLoadingOnsite] = useState(true);
-  const [isLoadingOnline, setIsLoadingOnline] = useState(true);
-  const [isLoadingHybrid, setIsLoadingHybrid] = useState(true);
+  const [bannerOpen, setBannerOpen] = useState([]);
+  const [eventByOpen, setEventByOpen] = useState([]);
+  const [bannerClose, setBannerClose] = useState([]);
+  const [eventByClose, setEventByClose] = useState([]);
+  const [isLoadingOpen, setIsLoadingOpen] = useState(true);
+  const [isLoadingClose, setIsLoadingClose] = useState(true);
 
-  // const getListEvent = () => {
 
-  //   axios
-  //     .get(
-  //       `${BASE_URL}/event_kategori_by_jenis_kategori/${route.params.kategori.id}`,
-  //     )
-  //     .then(response => response.data)
-  //     .then(data => {
-  //       setEventByKategori(data.get_event_by_kategori);
-  //       setEventByOnlineFull(data.get_event_by_online);
-  //       setEventByOnsiteFull(data.get_event_by_onsite);
-  //       setEventByHybridFull(data.get_event_by_hybrid);
-  //       for (let index = 0; index < 4; index++) {
-  //         if (data.get_event_by_online[index]) {
-  //           let gi = eventByOnline.push(data.get_event_by_online[index]);
-  //         }
-  //         if (data.get_event_by_onsite[index]) {
-  //           let gu = eventByOnsite.push(data.get_event_by_onsite[index]);
-  //         }
-  //         if (data.get_event_by_hybrid[index]) {
-  //           let ge = eventByHybrid.push(data.get_event_by_hybrid[index]);
-  //         }
-  //       }
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //     })
-  //     .finally(() => setIsLoading(false));
-  // };
-  const getListEventOnsite = () => {
+  const getListEventOpen = () => {
     axios
       .get(
-        `${BASE_URL}/event/kategori/${route.params.kategori.id}/online/onsite`,
+        `${BASE_URL}/event/kategori/${route.params.kategori.id}/status/open`,
       )
       .then(response => response.data)
       .then(data => {
-        for (let index = 0; index < 4; index++) {
+        for (let index = 1; index < 5; index++) {
           if (data.data[index]) {
-            let onsite = eventByOnsite.push(data.data[index]);
+            let open = eventByOpen.push(data.data[index]);
           }
         }
+        setBannerOpen(data.data[0]);
       })
       .catch(err => {
         console.log(err);
       })
-      .finally(() => setIsLoadingOnsite(false))
+      .finally(() => setIsLoadingOpen(false))
   };
-  const getListEventOnline = () => {
+  const getListEventClose = () => {
     axios
       .get(
-        `${BASE_URL}/event/kategori/${route.params.kategori.id}/online/online`,
+        `${BASE_URL}/event/kategori/${route.params.kategori.id}/status/close`,
       )
       .then(response => response.data)
       .then(data => {
-        for (let index = 0; index < 4; index++) {
+        for (let index = 1; index < 5; index++) {
           if (data.data[index]) {
-            let online = eventByOnline.push(data.data[index]);
+            let close = eventByClose.push(data.data[index]);
           }
         }
+        setBannerClose(data.data[0]);
       })
       .catch(err => {
         console.log(err);
       })
-      .finally(() => setIsLoadingOnline(false))
+      .finally(() => setIsLoadingClose(false))
   };
-  const getListEventHybrid = () => {
-    axios
-      .get(
-        `${BASE_URL}/event/kategori/${route.params.kategori.id}/online/hybrid`,
-      )
-      .then(response => response.data)
-      .then(data => {
-        // for (let index = 0; index < 4; index++) {
-        //   if (data.data[index]) {
-        //     let hybrid = eventByHybrid.push(data.data[index]);
-        //   }
-        // }
-      })
-      .catch(err => {
-        console.log(err);
-      })
-      .finally(() => setIsLoadingHybrid(false))
-  };
+
 
   useEffect(() => {
-    getListEventOnsite();
-    getListEventOnline();
-    getListEventHybrid();
+    getListEventOpen();
+    getListEventClose();
+
   }, []);
 
   // Mendapatkan luas layar
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
-  const onPressJenisOnsite = () => {
+  const onPressJenisOpen = () => {
     navigation.navigate('DetailEventList', {
       kategori: route.params.kategori.id,
-      jenis: 'onsite'
+      status: 'open'
     })
   };
-  const onPressJenisOnline = () => {
+  const onPressJenisClose = () => {
     navigation.navigate('DetailEventList', {
       kategori: route.params.kategori.id,
-      jenis: 'online'
+      status: 'close'
     })
   };
-  const onPressJenisHybrid = () => {
-    navigation.navigate('DetailEventList', {
-      kategori: route.params.kategori.id,
-      jenis: 'hybrid'
-    })
-  };
+
   const onPressDetailEvent = (event) => {
     navigation.navigate('DetailEvent', { id: event })
   }
@@ -167,23 +118,57 @@ const EventListScreen = ({ route }) => {
       <Box>
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
-            Onsite Event
+            Open Event
           </Text>
-          <TouchableOpacity onPress={() => onPressJenisOnsite()}>
+          <TouchableOpacity onPress={() => onPressJenisOpen()}>
             <Text fontSize={14} fontWeight="bold" color="#002A47">
               View all
             </Text>
           </TouchableOpacity>
         </HStack>
         <Flex direction="row" flexWrap="wrap" px={5}>
-          {isLoadingOnsite ? (
+          {isLoadingOpen ?
             <Spinner color="indigo.500" flex={1} />
-          ) : eventByOnsite.length != 0 ? (
-            eventByOnsite.map(function (onsite, index) {
+            : bannerOpen ?
+              < Box
+                width="100%"
+                m={2}  >
+                < TouchableOpacity onPress={() => onPressDetailEvent(bannerOpen.id)}>
+                  {bannerOpen.event_media[0].jenis == 'image' ? <Image
+                    source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${bannerOpen.event_media[0].file}` }}
+                    width="100%"
+                    alt='image'
+                    height={windowHeight * (15 / 100)}
+                    borderRadius={10}
+                    resizeMode="contain"
+                  /> : <Image
+                    source={{ uri: `${bannerOpen.event_media[0].thumbnail}` }}
+                    width="100%"
+                    alt='image'
+                    height={windowHeight * (20 / 100)}
+                    borderRadius={10}
+                    resizeMode="contain"
+                  />}
+                  <Text color="#A6ADB5" my={2}>
+                    {bannerOpen.tanggal_mulai}
+                  </Text>
+                  <Text fontWeight="bold" fontSize={16}>
+                    {bannerOpen.nama}
+                  </Text>
+                </TouchableOpacity>
+              </Box> : <Box width="100%">
+                <Text textAlign="center" color="#A6ADB5" my={3}>
+                  Event Tidak Ditemukan
+                </Text>
+              </Box>}
+          {isLoadingOpen ? (
+            <Spinner color="indigo.500" flex={1} />
+          ) : eventByOpen.length != 0 ? (
+            eventByOpen.map(function (open, index) {
               let getImage = [];
-              for (let i = 0; i < onsite.event_media.length; i++) {
-                if (onsite.event_media[i].utama == 1) {
-                  getImage.push(onsite.event_media[i])
+              for (let i = 0; i < open.event_media.length; i++) {
+                if (open.event_media[i].utama == 1) {
+                  getImage.push(open.event_media[i])
                 }
               }
               if (getImage[0].jenis == 'image') {
@@ -205,17 +190,21 @@ const EventListScreen = ({ route }) => {
                   resizeMode="contain"
                 />
               }
-              return <Box width="45%" m={2} key={index}>
-                <TouchableOpacity onPress={() => onPressDetailEvent(onsite.id)}>
+
+              return (< Box
+                width="45%"
+                m={2} key={index} >
+                < TouchableOpacity onPress={() => onPressDetailEvent(open.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {onsite.tanggal_mulai}
+                    {open.tanggal_mulai}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
-                    {onsite.nama}
+                    {open.nama}
                   </Text>
                 </TouchableOpacity>
               </Box>
+              )
             })
           ) : (
             <Box width="100%">
@@ -225,29 +214,62 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box>
+      </Box >
 
       {/* Online event */}
-      <Box>
+      < Box >
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
-            Online Event
+            Close Event
           </Text>
-          <TouchableOpacity onPress={() => onPressJenisOnline()}>
+          <TouchableOpacity onPress={() => onPressJenisClose()}>
             <Text fontSize={14} fontWeight="bold" color="#002A47">
               View all
             </Text>
           </TouchableOpacity>
         </HStack>
         <Flex direction="row" flexWrap="wrap" px={5}>
-          {isLoadingOnline ? (
+          {isLoadingClose ?
+            <Spinner color="indigo.500" flex={1} /> : bannerClose ?
+              < Box
+                width="100%"
+                m={2}  >
+                < TouchableOpacity onPress={() => onPressDetailEvent(bannerClose.id)}>
+                  {bannerClose.event_media[0].jenis == 'image' ? <Image
+                    source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${bannerClose.event_media[0].file}` }}
+                    width="100%"
+                    alt='image'
+                    height={windowHeight * (15 / 100)}
+                    borderRadius={10}
+                    resizeMode="contain"
+                  /> : <Image
+                    source={{ uri: `${bannerClose.event_media[0].thumbnail}` }}
+                    width="100%"
+                    alt='image'
+                    height={windowHeight * (20 / 100)}
+                    borderRadius={10}
+                    resizeMode="contain"
+                  />}
+                  <Text color="#A6ADB5" my={2}>
+                    {bannerClose.tanggal_mulai}
+                  </Text>
+                  <Text fontWeight="bold" fontSize={16}>
+                    {bannerClose.nama}
+                  </Text>
+                </TouchableOpacity>
+              </Box> : <Box width="100%">
+                <Text textAlign="center" color="#A6ADB5" my={3}>
+                  Event Tidak Ditemukan
+                </Text>
+              </Box>}
+          {isLoadingClose ? (
             <Spinner color="indigo.500" flex={1} />
-          ) : eventByOnline.length != 0 ? (
-            eventByOnline.map((online, index) => {
+          ) : eventByClose.length != 0 ? (
+            eventByClose.map((close, index) => {
               let getImage = [];
-              for (let i = 0; i < online.event_media.length; i++) {
-                if (online.event_media[i].utama == 1) {
-                  getImage.push(online.event_media[i])
+              for (let i = 0; i < close.event_media.length; i++) {
+                if (close.event_media[i].utama == 1) {
+                  getImage.push(close.event_media[i])
                 }
               }
               if (getImage[0].jenis == 'image') {
@@ -270,13 +292,13 @@ const EventListScreen = ({ route }) => {
                 />
               }
               return <Box width="45%" m={2} key={index}>
-                <TouchableOpacity onPress={() => onPressDetailEvent(online.id)}>
+                <TouchableOpacity onPress={() => onPressDetailEvent(close.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {online.tanggal_mulai}
+                    {close.tanggal_mulai}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
-                    {online.nama}
+                    {close.nama}
                   </Text>
                 </TouchableOpacity>
               </Box>
@@ -289,72 +311,10 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box>
+      </Box >
 
-      {/* Hybrid event */}
-      <Box>
-        <HStack p={5} alignItems="center" justifyContent="space-between">
-          <Text fontSize={18} fontWeight="bold">
-            Hybrid Event
-          </Text>
-          <TouchableOpacity onPress={() => onPressJenisHybrid()}>
-            <Text fontSize={14} fontWeight="bold" color="#002A47">
-              View all
-            </Text>
-          </TouchableOpacity>
-        </HStack>
-        <Flex direction="row" flexWrap="wrap" px={5}>
-          {isLoadingHybrid ? (
-            <Spinner color="indigo.500" flex={1} />
-          ) : eventByHybrid.length != 0 ? (
-            eventByHybrid.map((hybrid, index) => {
-              let getImage = [];
-              for (let i = 0; i < hybrid.event_media.length; i++) {
-                if (hybrid.event_media[i].utama == 1) {
-                  getImage.push(hybrid.event_media[i])
-                }
-              }
-              if (getImage[0].jenis == 'image') {
-                var image = <Image
-                  source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${getImage[0].file}` }}
-                  width="100%"
-                  alt='image'
-                  height={windowHeight * (15 / 100)}
-                  borderRadius={10}
-                  resizeMode="contain"
-                />
-              } else {
-                var image = <Image
-                  source={{ uri: `${getImage[0].thumbnail}` }}
-                  width="100%"
-                  alt='image'
-                  height={windowHeight * (15 / 100)}
-                  borderRadius={10}
-                  resizeMode="contain"
-                />
-              }
-              return <Box width="45%" m={2} key={index}>
-                <TouchableOpacity onPress={() => onPressDetailEvent(hybrid.id)}>
-                  {image}
-                  <Text color="#A6ADB5" my={2}>
-                    {hybrid.tanggal_mulai}
-                  </Text>
-                  <Text fontWeight="bold" fontSize={16}>
-                    {hybrid.nama}
-                  </Text>
-                </TouchableOpacity>
-              </Box>
-            })
-          ) : (
-            <Box width="100%">
-              <Text textAlign="center" color="#A6ADB5" my={3}>
-                Event Tidak Ditemukan
-              </Text>
-            </Box>
-          )}
-        </Flex>
-      </Box>
-    </ScrollView>
+
+    </ScrollView >
   );
 };
 
