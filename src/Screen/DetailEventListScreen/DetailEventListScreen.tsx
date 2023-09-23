@@ -15,11 +15,12 @@ const DetailtEventListScreen = ({ route }) => {
     const getListEvent = () => {
         axios
             .get(
-                `${BASE_URL}/event/kategori/${route.params.kategori}/status/${route.params.status}`,
+                `${BASE_URL}/event/kategori/${route.params.id}/status/${route.params.status}`,
             )
             .then(response => response.data)
             .then(data => {
                 setListEvent(data.data)
+
             })
             .catch(err => {
                 console.log(err);
@@ -42,10 +43,10 @@ const DetailtEventListScreen = ({ route }) => {
     }
 
     return (
-        <ScrollView>
+        <ScrollView bgColor="#fff">
             <Header />
 
-            <Text m={5} fontSize={18} fontWeight="bold">Kategori : {route.params.jenis}</Text>
+            <Text m={5} fontSize={18} fontWeight="bold">Kategori : {route.params.kategori} event</Text>
             <Flex direction="row" flexWrap="wrap" px={5}>
                 {isLoading ? (
                     <Spinner color="indigo.500" flex={1} />
@@ -59,7 +60,7 @@ const DetailtEventListScreen = ({ route }) => {
                         }
                         if (getImage[0].jenis == 'image') {
                             var image = <Image
-                                source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${getImage[0].file}` }}
+                                source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${getImage[0].file}` }}
                                 width="100%"
                                 alt='image'
                                 height={windowHeight * (15 / 100)}

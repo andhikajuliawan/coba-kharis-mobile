@@ -361,7 +361,7 @@ const HomeScreen = () => {
                   {/* Percobaan Fetch */}
                   <Image
                     source={{
-                      uri: `http://192.168.1.11:8000/storage/files/event-categorie/${kategori.icon}`,
+                      uri: `http://192.168.1.4:8000/storage/files/event-categorie/${kategori.icon}`,
                     }} resizeMode="contain"
                     style={{
                       width: windowWidth * (20 / 100),
@@ -409,7 +409,7 @@ const HomeScreen = () => {
                   key={index}>
                   <Image
                     source={{
-                      uri: `http://192.168.1.11:8000/storage/files/event-categorie/${image.icon}`,
+                      uri: `http://192.168.1.4:8000/storage/files/event-categorie/${image.icon}`,
                     }}
                     resizeMode="contain"
                     style={{

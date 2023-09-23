@@ -21,6 +21,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
+import { format } from 'date-fns';
 
 const EventListScreen = ({ route }) => {
   // Navigation init
@@ -28,7 +29,6 @@ const EventListScreen = ({ route }) => {
   const [inputPencarian, setInputPencarian] = useState('');
   const [bannerOpen, setBannerOpen] = useState([]);
   const [eventByOpen, setEventByOpen] = useState([]);
-  const [bannerClose, setBannerClose] = useState([]);
   const [eventByClose, setEventByClose] = useState([]);
   const [isLoadingOpen, setIsLoadingOpen] = useState(true);
   const [isLoadingClose, setIsLoadingClose] = useState(true);
@@ -60,12 +60,12 @@ const EventListScreen = ({ route }) => {
       )
       .then(response => response.data)
       .then(data => {
-        for (let index = 1; index < 5; index++) {
+        for (let index = 0; index < 4; index++) {
           if (data.data[index]) {
             let close = eventByClose.push(data.data[index]);
           }
         }
-        setBannerClose(data.data[0]);
+
       })
       .catch(err => {
         console.log(err);
@@ -86,14 +86,17 @@ const EventListScreen = ({ route }) => {
 
   const onPressJenisOpen = () => {
     navigation.navigate('DetailEventList', {
-      kategori: route.params.kategori.id,
-      status: 'open'
+      id: route.params.kategori.id,
+      status: 'open',
+      kategori: 'upcoming'
     })
   };
-  const onPressJenisClose = () => {
+  const onPressJenisClose = (close) => {
+    console.log(close);
     navigation.navigate('DetailEventList', {
-      kategori: route.params.kategori.id,
-      status: 'close'
+      id: route.params.kategori.id,
+      status: 'close',
+      kategori: 'last'
     })
   };
 
@@ -118,7 +121,7 @@ const EventListScreen = ({ route }) => {
       <Box>
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
-            Open Event
+            Upcoming Event
           </Text>
           <TouchableOpacity onPress={() => onPressJenisOpen()}>
             <Text fontSize={14} fontWeight="bold" color="#002A47">
@@ -133,22 +136,23 @@ const EventListScreen = ({ route }) => {
               < Box
                 width="100%"
                 m={2}  >
-                < TouchableOpacity onPress={() => onPressDetailEvent(bannerOpen.id)}>
-                  {bannerOpen.event_media[0].jenis == 'image' ? <Image
-                    source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${bannerOpen.event_media[0].file}` }}
-                    width="100%"
-                    alt='image'
-                    height={windowHeight * (15 / 100)}
-                    borderRadius={10}
-                    resizeMode="contain"
-                  /> : <Image
-                    source={{ uri: `${bannerOpen.event_media[0].thumbnail}` }}
-                    width="100%"
-                    alt='image'
-                    height={windowHeight * (20 / 100)}
-                    borderRadius={10}
-                    resizeMode="contain"
-                  />}
+                < TouchableOpacity onPress={() => onPressDetailEvent(bannerOpen.id)}>{
+                  bannerOpen.event_media[0] ?
+                    bannerOpen.event_media[0].jenis == 'image' ? <Image
+                      source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${bannerOpen.event_media[0].file}` }}
+                      width="100%"
+                      alt='image'
+                      height={windowHeight * (15 / 100)}
+                      borderRadius={10}
+                      resizeMode="contain"
+                    /> : <Image
+                      source={{ uri: `${bannerOpen.event_media[0].thumbnail}` }}
+                      width="100%"
+                      alt='image'
+                      height={windowHeight * (20 / 100)}
+                      borderRadius={10}
+                      resizeMode="contain"
+                    /> : <Box width="100%" height={windowHeight * (20 / 100)}> <Center>no Image</Center></Box>}
                   <Text color="#A6ADB5" my={2}>
                     {bannerOpen.tanggal_mulai}
                   </Text>
@@ -173,7 +177,7 @@ const EventListScreen = ({ route }) => {
               }
               if (getImage[0].jenis == 'image') {
                 var image = <Image
-                  source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${getImage[0].file}` }}
+                  source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${getImage[0].file}` }}
                   width="100%"
                   alt='image'
                   height={windowHeight * (15 / 100)}
@@ -190,6 +194,11 @@ const EventListScreen = ({ route }) => {
                   resizeMode="contain"
                 />
               }
+              let dateStart = new Date(open.tanggal_mulai);
+              let dateEnd = new Date(open.tanggal_selesai);
+              let formatDateStart = format(dateStart, "dd");
+              let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+              let displayDate = `${formatDateStart} - ${formatDateEnd}`
 
               return (< Box
                 width="45%"
@@ -197,7 +206,7 @@ const EventListScreen = ({ route }) => {
                 < TouchableOpacity onPress={() => onPressDetailEvent(open.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {open.tanggal_mulai}
+                    {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
                     {open.nama}
@@ -220,7 +229,7 @@ const EventListScreen = ({ route }) => {
       < Box >
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
-            Close Event
+            Last Event
           </Text>
           <TouchableOpacity onPress={() => onPressJenisClose()}>
             <Text fontSize={14} fontWeight="bold" color="#002A47">
@@ -229,39 +238,7 @@ const EventListScreen = ({ route }) => {
           </TouchableOpacity>
         </HStack>
         <Flex direction="row" flexWrap="wrap" px={5}>
-          {isLoadingClose ?
-            <Spinner color="indigo.500" flex={1} /> : bannerClose ?
-              < Box
-                width="100%"
-                m={2}  >
-                < TouchableOpacity onPress={() => onPressDetailEvent(bannerClose.id)}>
-                  {bannerClose.event_media[0].jenis == 'image' ? <Image
-                    source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${bannerClose.event_media[0].file}` }}
-                    width="100%"
-                    alt='image'
-                    height={windowHeight * (15 / 100)}
-                    borderRadius={10}
-                    resizeMode="contain"
-                  /> : <Image
-                    source={{ uri: `${bannerClose.event_media[0].thumbnail}` }}
-                    width="100%"
-                    alt='image'
-                    height={windowHeight * (20 / 100)}
-                    borderRadius={10}
-                    resizeMode="contain"
-                  />}
-                  <Text color="#A6ADB5" my={2}>
-                    {bannerClose.tanggal_mulai}
-                  </Text>
-                  <Text fontWeight="bold" fontSize={16}>
-                    {bannerClose.nama}
-                  </Text>
-                </TouchableOpacity>
-              </Box> : <Box width="100%">
-                <Text textAlign="center" color="#A6ADB5" my={3}>
-                  Event Tidak Ditemukan
-                </Text>
-              </Box>}
+
           {isLoadingClose ? (
             <Spinner color="indigo.500" flex={1} />
           ) : eventByClose.length != 0 ? (
@@ -291,11 +268,17 @@ const EventListScreen = ({ route }) => {
                   resizeMode="contain"
                 />
               }
+              let dateStart = new Date(close.tanggal_mulai);
+              let dateEnd = new Date(close.tanggal_selesai);
+              let formatDateStart = format(dateStart, "dd");
+              let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+              let displayDate = `${formatDateStart} - ${formatDateEnd}`
+
               return <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(close.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {close.tanggal_mulai}
+                    {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
                     {close.nama}

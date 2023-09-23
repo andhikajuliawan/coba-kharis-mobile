@@ -10,10 +10,11 @@ import RenderHTML from "react-native-render-html";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 // SVG
-import Date from '../../../assets/icons/EventDetail/calendar.svg'
+import Dates from '../../../assets/icons/EventDetail/calendar.svg'
 import Location from '../../../assets/icons/EventDetail/mappin.svg'
 import Person from '../../../assets/icons/EventDetail/person.svg'
 import Money from '../../../assets/icons/EventDetail/giftcard.svg'
+import { format } from "date-fns";
 
 
 
@@ -32,7 +33,6 @@ const DetailtEventScreen = ({ route }) => {
             .then(response => response.data)
             .then(data => {
                 setEventDetail(data.event_detail);
-                // console.log(data.event_detail);
             })
 
             .then(() => {
@@ -57,65 +57,20 @@ const DetailtEventScreen = ({ route }) => {
         html: `
           ${eventDetail.deskripsi}`
     };
+    const ketentuan = {
+        html: `
+          ${eventDetail.ketentuan}`
+    };
 
     const { width } = useWindowDimensions();
     // Mendapatkan luas layar
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
 
-
     if (eventDetail.tanggal_mulai != null) {
-        let tanggal_mulai = eventDetail.tanggal_mulai.split(' ');
-        let tanggal_selesai = eventDetail.tanggal_selesai.split(' ');
-        let split_tanggal_mulai = tanggal_mulai[0].split('-');
-        let split_tanggal_selesai = tanggal_selesai[0].split('-');
-        let tanggal1 = split_tanggal_mulai[2]
-        let tanggal2 = split_tanggal_selesai[2]
-        let tahun = split_tanggal_mulai[0]
-        let bulan = ''
-        // if (split_tanggal_mulai[1] == 1) {
-        //     bulan = 'januari'
-        // }
-        // if (split_tanggal_mulai[1] == 2) {
-        //     bulan = 'februari'
-        // }
-        // if (split_tanggal_mulai[1] == 3) {
-        //     bulan = 'maret'
-        // }
-        // if (split_tanggal_mulai[1] == 4) {
-        //     bulan = 'april'
-        // }
-        // if (split_tanggal_mulai[1] == 5) {
-        //     bulan = 'mei'
-        // }
-        // if (split_tanggal_mulai[1] == 6) {
-        //     bulan = 'juni'
-        // }
-        // if (split_tanggal_mulai[1] == 7) {
-        //     bulan = 'juli'
-        // }
-        // if (split_tanggal_mulai[1] == 8) {
-        //     bulan = 'agustus'
-        // }
-        // if (split_tanggal_mulai[1] == 9) {
-        //     bulan = 'september'
-        // }
-        // if (split_tanggal_mulai[1] == 10) {
-        //     bulan = 'oktober'
-        // }
-        // if (split_tanggal_mulai[1] == 11) {
-        //     bulan = 'november'
-        // }
-        // if (split_tanggal_mulai[1] == 12) {
-        //     bulan = 'desember'
-        // }
-        let hasil = tanggal1 + ' - ' + tanggal2 + ' ' + bulan + ' ' + tahun;
-
-
-
+        let date_start = new Date(eventDetail.tanggal_mulai);
+        var formattedDate = format(date_start, "dd MMMM yyyy");
     }
-
-
 
     return (
         <ScrollView bgColor="#fff">
@@ -125,7 +80,7 @@ const DetailtEventScreen = ({ route }) => {
                 </Box>
                 {isLoading ? <Spinner /> : eventDetail.event_media[0].jenis == 'image' ?
                     <ImageBackground
-                        source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${eventDetail.event_media[0].file}` }}
+                        source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${eventDetail.event_media[0].file}` }}
                         resizeMode="cover"
                         style={styles.image} /> :
                     <ImageBackground
@@ -138,12 +93,12 @@ const DetailtEventScreen = ({ route }) => {
                     <Box px={5} my={3} borderTopRadius={20} mt={-10} zIndex={1} bgColor="#fff">
                         <Text fontSize={24} fontWeight="bold" mb={1} mt={5}>{eventDetail.nama}</Text>
                         <HStack alignItems="center" >
-                            <Date width={scale(24)} height={scale(24)} />
+                            <Dates width={scale(24)} height={scale(24)} />
                             <Text ml={1} fontSize={16} mb={1} >{date}</Text>
                         </HStack>
                         <HStack alignItems="center" >
                             <Location width={scale(24)} height={scale(24)} />
-                            <Text ml={1} fontSize={16} mb={1}>The southern hotel, surabaya, jawa timur</Text>
+                            <Text ml={1} fontSize={16} mb={1}>{eventDetail.lokasi}</Text>
                         </HStack>
                         <HStack justifyContent="space-between" >
                             <HStack>
@@ -166,7 +121,7 @@ const DetailtEventScreen = ({ route }) => {
                                 eventDetail.event_media.map((item, index) =>
                                 (
                                     item.jenis == 'image' ?
-                                        <Image source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${item.file}` }}
+                                        <Image source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${item.file}` }}
                                             alt="Alternate Text" size="xl" borderRadius={5} mr={2} key={index} />
 
                                         : item.jenis == 'youtube' ?
@@ -231,9 +186,11 @@ const DetailtEventScreen = ({ route }) => {
                     </Box>
                 </TouchableOpacity>
                 <Box m={5}>
-                    <Text fontWeight="bold" color="#555F65" fontSize={16} > Ketentuan Peserta</Text>
-                    <Text color="#555F65" fontSize={16}>{eventDetail.ketentuan}</Text>
-
+                    <Text fontWeight="bold" color="#555F65" fontSize={16} >Ketentuan Peserta</Text>
+                    <RenderHTML
+                        contentWidth={width}
+                        source={ketentuan}
+                    />
                 </Box>
             </>
         </ScrollView >
