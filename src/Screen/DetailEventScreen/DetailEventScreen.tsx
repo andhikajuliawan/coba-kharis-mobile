@@ -28,7 +28,7 @@ const DetailtEventScreen = ({ route }) => {
     const getDetailEvent = () => {
         axios
             .get(
-                `${BASE_URL}/event-detail/${route.params.id}`,
+                `${BASE_URL}/api/event-detail/${route.params.id}`,
             )
             .then(response => response.data)
             .then(data => {
@@ -80,7 +80,7 @@ const DetailtEventScreen = ({ route }) => {
                 </Box>
                 {isLoading ? <Spinner /> : eventDetail.event_media[0].jenis == 'image' ?
                     <ImageBackground
-                        source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${eventDetail.event_media[0].file}` }}
+                        source={{ uri: `${BASE_URL}/storage/files/event-media/${eventDetail.event_media[0].file}` }}
                         resizeMode="cover"
                         style={styles.image} /> :
                     <ImageBackground
@@ -121,7 +121,7 @@ const DetailtEventScreen = ({ route }) => {
                                 eventDetail.event_media.map((item, index) =>
                                 (
                                     item.jenis == 'image' ?
-                                        <Image source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${item.file}` }}
+                                        <Image source={{ uri: `${BASE_URL}/storage/files/event-media/${item.file}` }}
                                             alt="Alternate Text" size="xl" borderRadius={5} mr={2} key={index} />
 
                                         : item.jenis == 'youtube' ?

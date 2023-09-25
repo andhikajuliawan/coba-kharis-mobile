@@ -221,7 +221,7 @@ const HomeScreen = () => {
   };
 
   const getCategories = () => {
-    axios.get(`${BASE_URL}/event-categories`)
+    axios.get(`${BASE_URL}/api/event-categories`)
       .then((response) => {
         let menu = response.data.categories;
         setMenu(menu)
@@ -361,7 +361,7 @@ const HomeScreen = () => {
                   {/* Percobaan Fetch */}
                   <Image
                     source={{
-                      uri: `http://192.168.1.4:8000/storage/files/event-categorie/${kategori.icon}`,
+                      uri: `${BASE_URL}/storage/files/event-categorie/${kategori.icon}`,
                     }} resizeMode="contain"
                     style={{
                       width: windowWidth * (20 / 100),
@@ -409,7 +409,7 @@ const HomeScreen = () => {
                   key={index}>
                   <Image
                     source={{
-                      uri: `http://192.168.1.4:8000/storage/files/event-categorie/${image.icon}`,
+                      uri: `${BASE_URL}/storage/files/event-categorie/${image.icon}`,
                     }}
                     resizeMode="contain"
                     style={{

@@ -37,7 +37,7 @@ const EventListScreen = ({ route }) => {
   const getListEventOpen = () => {
     axios
       .get(
-        `${BASE_URL}/event/kategori/${route.params.kategori.id}/status/open`,
+        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/open`,
       )
       .then(response => response.data)
       .then(data => {
@@ -56,7 +56,7 @@ const EventListScreen = ({ route }) => {
   const getListEventClose = () => {
     axios
       .get(
-        `${BASE_URL}/event/kategori/${route.params.kategori.id}/status/close`,
+        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/close`,
       )
       .then(response => response.data)
       .then(data => {
@@ -139,7 +139,7 @@ const EventListScreen = ({ route }) => {
                 < TouchableOpacity onPress={() => onPressDetailEvent(bannerOpen.id)}>{
                   bannerOpen.event_media[0] ?
                     bannerOpen.event_media[0].jenis == 'image' ? <Image
-                      source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${bannerOpen.event_media[0].file}` }}
+                      source={{ uri: `${BASE_URL}/storage/files/event-media/${bannerOpen.event_media[0].file}` }}
                       width="100%"
                       alt='image'
                       height={windowHeight * (15 / 100)}
@@ -177,7 +177,7 @@ const EventListScreen = ({ route }) => {
               }
               if (getImage[0].jenis == 'image') {
                 var image = <Image
-                  source={{ uri: `http://192.168.1.4:8000/storage/files/event-media/${getImage[0].file}` }}
+                  source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
                   width="100%"
                   alt='image'
                   height={windowHeight * (15 / 100)}
