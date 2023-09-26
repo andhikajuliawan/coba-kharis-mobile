@@ -20,6 +20,7 @@ import Setting from '../../../../assets/icons/EvenList/Header/Setting.svg';
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
 import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 
 
@@ -28,7 +29,8 @@ const Header = () => {
 
 
     return (
-        <ImageBackground source={require('../../../../assets/bg/gradientTop.png')} resizeMode="cover" >
+        <LinearGradient colors={['#3E3E3E', '#00000000']}
+            style={{ width: '100%' }}>
             <View style={styles.container}>
                 <View style={styles.space1}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -43,7 +45,7 @@ const Header = () => {
                     <Setting width={scale(28)} height={scale(28)} />
                 </View>
             </View>
-        </ImageBackground>
+        </LinearGradient>
 
 
     );

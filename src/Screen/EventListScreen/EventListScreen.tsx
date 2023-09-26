@@ -28,11 +28,25 @@ const EventListScreen = ({ route }) => {
   const navigation = useNavigation();
   const [inputPencarian, setInputPencarian] = useState('');
   const [bannerOpen, setBannerOpen] = useState([]);
+  const [listEvent, setListEvent] = useState([]);
   const [eventByOpen, setEventByOpen] = useState([]);
   const [eventByClose, setEventByClose] = useState([]);
+  const [eventByPencarian, setEventByPencarian] = useState([]);
   const [isLoadingOpen, setIsLoadingOpen] = useState(true);
   const [isLoadingClose, setIsLoadingClose] = useState(true);
 
+  const getListEvent = () => {
+    axios
+      .get(`${BASE_URL}/api/event/kategori/${route.params.kategori.id}`)
+      .then(response => response.data)
+      .then(data => {
+        setListEvent(data.data);
+      })
+      .catch(err => {
+        console.log(err);
+      })
+      .finally(() => setIsLoadingOpen(false));
+  };
 
   const getListEventOpen = () => {
     axios
@@ -51,7 +65,7 @@ const EventListScreen = ({ route }) => {
       .catch(err => {
         console.log(err);
       })
-      .finally(() => setIsLoadingOpen(false))
+      .finally(() => setIsLoadingOpen(false));
   };
   const getListEventClose = () => {
     axios
@@ -65,44 +79,64 @@ const EventListScreen = ({ route }) => {
             let close = eventByClose.push(data.data[index]);
           }
         }
-
       })
       .catch(err => {
         console.log(err);
       })
-      .finally(() => setIsLoadingClose(false))
+      .finally(() => setIsLoadingClose(false));
   };
 
-
   useEffect(() => {
+    getListEvent();
     getListEventOpen();
     getListEventClose();
-
   }, []);
 
   // Mendapatkan luas layar
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
+  const InputPencarian = pencarian => {
+    // Check if searched text is not blank
+    if (pencarian) {
+      // Inserted text is not blank
+      // Filter the masterDataSource and update FilteredDataSource
+      const newData = listEvent.filter(function (item) {
+        // Applying filter for the inserted text in search bar
+        const itemData = item.nama ? item.nama.toUpperCase() : ''.toUpperCase();
+        const textData = pencarian.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setEventByPencarian(newData);
+      console.log(newData);
+      setInputPencarian(pencarian);
+    } else {
+      // Inserted text is blank
+      // Update FilteredDataSource with masterDataSource
+      setEventByPencarian([]);
+      setInputPencarian(pencarian);
+    }
+  };
+
   const onPressJenisOpen = () => {
     navigation.navigate('DetailEventList', {
       id: route.params.kategori.id,
       status: 'open',
-      kategori: 'upcoming'
-    })
+      kategori: 'upcoming',
+    });
   };
-  const onPressJenisClose = (close) => {
+  const onPressJenisClose = close => {
     console.log(close);
     navigation.navigate('DetailEventList', {
       id: route.params.kategori.id,
       status: 'close',
-      kategori: 'last'
-    })
+      kategori: 'last',
+    });
   };
 
-  const onPressDetailEvent = (event) => {
-    navigation.navigate('DetailEvent', { id: event })
-  }
+  const onPressDetailEvent = event => {
+    navigation.navigate('DetailEvent', { id: event });
+  };
 
   return (
     <ScrollView bgColor="#fff">
@@ -113,10 +147,58 @@ const EventListScreen = ({ route }) => {
         fontSize={16}
         mt={5}
         mx={5}
+        onChangeText={pencarian => InputPencarian(pencarian)}
         value={inputPencarian}
         borderRadius="xl"
-        InputRightElement={<SearchInput width={scale(25)} height={scale(25)} />}
+      // InputRightElement={<SearchInput width={scale(25)} height={scale(25)} />}
       />
+      <Box mx={5}>
+        {setEventByPencarian != 0 ? (
+          eventByPencarian.map((pencarian, index) => {
+            if (pencarian.event_media.jenis == 'image') {
+              var image = (
+                <Image
+                  source={{
+                    uri: `${BASE_URL}/storage/files/event-media/${pencarian.event_media.file}`,
+                  }}
+                  width="100%"
+                  alt="image"
+                  height={windowHeight * (15 / 100)}
+                  borderRadius={10}
+                  resizeMode="contain"
+                />
+              );
+            } else {
+              var image = (
+                <Image
+                  source={{ uri: `${pencarian.event_media.thumbnail}` }}
+                  width="100%"
+                  alt="image"
+                  height={windowHeight * (15 / 100)}
+                  borderRadius={10}
+                  resizeMode="contain"
+                />
+              );
+            }
+            return (
+              <Box width="45%" m={2} key={index}>
+                <TouchableOpacity
+                  onPress={() => onPressDetailEvent(pencarian.id)}>
+                  {image}
+                  <Text color="#A6ADB5" my={2}>
+                    {pencarian.tanggal_mulai}
+                  </Text>
+                  <Text fontWeight="bold" fontSize={16}>
+                    {pencarian.nama}
+                  </Text>
+                </TouchableOpacity>
+              </Box>
+            );
+          })
+        ) : (
+          <></>
+        )}
+      </Box>
       {/* Onsite Event */}
       <Box>
         <HStack p={5} alignItems="center" justifyContent="space-between">
@@ -130,41 +212,55 @@ const EventListScreen = ({ route }) => {
           </TouchableOpacity>
         </HStack>
         <Flex direction="row" flexWrap="wrap" px={5}>
-          {isLoadingOpen ?
+          {isLoadingOpen ? (
             <Spinner color="indigo.500" flex={1} />
-            : bannerOpen ?
-              < Box
-                width="100%"
-                m={2}  >
-                < TouchableOpacity onPress={() => onPressDetailEvent(bannerOpen.id)}>{
-                  bannerOpen.event_media[0] ?
-                    bannerOpen.event_media[0].jenis == 'image' ? <Image
-                      source={{ uri: `${BASE_URL}/storage/files/event-media/${bannerOpen.event_media[0].file}` }}
+          ) : bannerOpen != 0 ? (
+            <Box width="100%" m={2}>
+              <TouchableOpacity
+                onPress={() => onPressDetailEvent(bannerOpen.id)}>
+                {bannerOpen.event_media[0] ? (
+                  bannerOpen.event_media[0].jenis == 'image' ? (
+                    <Image
+                      source={{
+                        uri: `${BASE_URL}/storage/files/event-media/${bannerOpen.event_media[0].file}`,
+                      }}
                       width="100%"
-                      alt='image'
+                      alt="image"
                       height={windowHeight * (15 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
-                    /> : <Image
+                    />
+                  ) : (
+                    <Image
                       source={{ uri: `${bannerOpen.event_media[0].thumbnail}` }}
                       width="100%"
-                      alt='image'
+                      alt="image"
                       height={windowHeight * (20 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
-                    /> : <Box width="100%" height={windowHeight * (20 / 100)}> <Center>no Image</Center></Box>}
-                  <Text color="#A6ADB5" my={2}>
-                    {bannerOpen.tanggal_mulai}
-                  </Text>
-                  <Text fontWeight="bold" fontSize={16}>
-                    {bannerOpen.nama}
-                  </Text>
-                </TouchableOpacity>
-              </Box> : <Box width="100%">
-                <Text textAlign="center" color="#A6ADB5" my={3}>
-                  Event Tidak Ditemukan
+                    />
+                  )
+                ) : (
+                  <Box width="100%" height={windowHeight * (20 / 100)}>
+                    {' '}
+                    <Center>no Image</Center>
+                  </Box>
+                )}
+                <Text color="#A6ADB5" my={2}>
+                  {bannerOpen.tanggal_mulai}
                 </Text>
-              </Box>}
+                <Text fontWeight="bold" fontSize={16}>
+                  {bannerOpen.nama}
+                </Text>
+              </TouchableOpacity>
+            </Box>
+          ) : (
+            <Box width="100%">
+              <Text textAlign="center" color="#A6ADB5" my={3}>
+                Event Tidak Ditemukan
+              </Text>
+            </Box>
+          )}
           {isLoadingOpen ? (
             <Spinner color="indigo.500" flex={1} />
           ) : eventByOpen.length != 0 ? (
@@ -172,48 +268,64 @@ const EventListScreen = ({ route }) => {
               let getImage = [];
               for (let i = 0; i < open.event_media.length; i++) {
                 if (open.event_media[i].utama == 1) {
-                  getImage.push(open.event_media[i])
+                  getImage.push(open.event_media[i]);
                 }
               }
-              if (getImage[0].jenis == 'image') {
-                var image = <Image
-                  source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
-                  width="100%"
-                  alt='image'
-                  height={windowHeight * (15 / 100)}
-                  borderRadius={10}
-                  resizeMode="contain"
-                />
+              if (getImage.length != 0) {
+                if (open.event_media.jenis == 'image') {
+                  var image = (
+                    <Image
+                      source={{
+                        uri: `${BASE_URL}/storage/files/event-media/${open.event_media.file}`,
+                      }}
+                      width="100%"
+                      alt="image"
+                      height={windowHeight * (15 / 100)}
+                      borderRadius={10}
+                      resizeMode="contain"
+                    />
+                  );
+                } else {
+                  var image = (
+                    <Image
+                      source={{ uri: `${open.event_media.thumbnail}` }}
+                      width="100%"
+                      alt="image"
+                      height={windowHeight * (15 / 100)}
+                      borderRadius={10}
+                      resizeMode="contain"
+                    />
+                  );
+                }
               } else {
-                var image = <Image
-                  source={{ uri: `${getImage[0].thumbnail}` }}
-                  width="100%"
-                  alt='image'
-                  height={windowHeight * (15 / 100)}
-                  borderRadius={10}
-                  resizeMode="contain"
-                />
+                var image = (
+                  <Box
+                    width="100%"
+                    height={windowHeight * (15 / 100)}
+                    borderRadius={10}>
+                    <Center>no Image</Center>
+                  </Box>
+                );
               }
               let dateStart = new Date(open.tanggal_mulai);
               let dateEnd = new Date(open.tanggal_selesai);
-              let formatDateStart = format(dateStart, "dd");
-              let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
-              let displayDate = `${formatDateStart} - ${formatDateEnd}`
+              let formatDateStart = format(dateStart, 'dd');
+              let formatDateEnd = format(dateEnd, 'dd MMMM yyyy');
+              let displayDate = `${formatDateStart} - ${formatDateEnd}`;
 
-              return (< Box
-                width="45%"
-                m={2} key={index} >
-                < TouchableOpacity onPress={() => onPressDetailEvent(open.id)}>
-                  {image}
-                  <Text color="#A6ADB5" my={2}>
-                    {displayDate}
-                  </Text>
-                  <Text fontWeight="bold" fontSize={16}>
-                    {open.nama}
-                  </Text>
-                </TouchableOpacity>
-              </Box>
-              )
+              return (
+                <Box width="45%" m={2} key={index}>
+                  <TouchableOpacity onPress={() => onPressDetailEvent(open.id)}>
+                    {image}
+                    <Text color="#A6ADB5" my={2}>
+                      {displayDate}
+                    </Text>
+                    <Text fontWeight="bold" fontSize={16}>
+                      {open.nama}
+                    </Text>
+                  </TouchableOpacity>
+                </Box>
+              );
             })
           ) : (
             <Box width="100%">
@@ -223,10 +335,10 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box >
+      </Box>
 
-      {/* Online event */}
-      < Box >
+      {/* Last event */}
+      <Box>
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
             Last Event
@@ -238,7 +350,6 @@ const EventListScreen = ({ route }) => {
           </TouchableOpacity>
         </HStack>
         <Flex direction="row" flexWrap="wrap" px={5}>
-
           {isLoadingClose ? (
             <Spinner color="indigo.500" flex={1} />
           ) : eventByClose.length != 0 ? (
@@ -246,45 +357,65 @@ const EventListScreen = ({ route }) => {
               let getImage = [];
               for (let i = 0; i < close.event_media.length; i++) {
                 if (close.event_media[i].utama == 1) {
-                  getImage.push(close.event_media[i])
+                  getImage.push(close.event_media[i]);
                 }
               }
-              if (getImage[0].jenis == 'image') {
-                var image = <Image
-                  source={{ uri: `http://192.168.1.11:8000/storage/files/event-media/${getImage[0].file}` }}
-                  width="100%"
-                  alt='image'
-                  height={windowHeight * (15 / 100)}
-                  borderRadius={10}
-                  resizeMode="contain"
-                />
+              if (getImage.length != 0) {
+                if (getImage[0].jenis == 'image') {
+                  var image = (
+                    <Image
+                      source={{
+                        uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}`,
+                      }}
+                      width="100%"
+                      alt="image"
+                      height={windowHeight * (15 / 10)}
+                      borderRadius={10}
+                      resizeMode="contain"
+                    />
+                  );
+                } else {
+                  var image = (
+                    <Image
+                      source={{ uri: `${getImage[0].thumbnail}` }}
+                      width="100%"
+                      alt="image"
+                      height={windowHeight * (15 / 100)}
+                      borderRadius={10}
+                      resizeMode="contain"
+                    />
+                  );
+                }
               } else {
-                var image = <Image
-                  source={{ uri: `${getImage[0].thumbnail}` }}
-                  width="100%"
-                  alt='image'
-                  height={windowHeight * (15 / 100)}
-                  borderRadius={10}
-                  resizeMode="contain"
-                />
+                var image = (
+                  <Box
+                    width="100%"
+                    height={windowHeight * (15 / 100)}
+                    borderRadius={10}>
+                    <Center>no Image</Center>
+                  </Box>
+                );
               }
               let dateStart = new Date(close.tanggal_mulai);
               let dateEnd = new Date(close.tanggal_selesai);
-              let formatDateStart = format(dateStart, "dd");
-              let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
-              let displayDate = `${formatDateStart} - ${formatDateEnd}`
+              let formatDateStart = format(dateStart, 'dd');
+              let formatDateEnd = format(dateEnd, 'dd MMMM yyyy');
+              let displayDate = `${formatDateStart} - ${formatDateEnd}`;
 
-              return <Box width="45%" m={2} key={index}>
-                <TouchableOpacity onPress={() => onPressDetailEvent(close.id)}>
-                  {image}
-                  <Text color="#A6ADB5" my={2}>
-                    {displayDate}
-                  </Text>
-                  <Text fontWeight="bold" fontSize={16}>
-                    {close.nama}
-                  </Text>
-                </TouchableOpacity>
-              </Box>
+              return (
+                <Box width="45%" m={2} key={index}>
+                  <TouchableOpacity
+                    onPress={() => onPressDetailEvent(close.id)}>
+                    {image}
+                    <Text color="#A6ADB5" my={2}>
+                      {displayDate}
+                    </Text>
+                    <Text fontWeight="bold" fontSize={16}>
+                      {close.nama}
+                    </Text>
+                  </TouchableOpacity>
+                </Box>
+              );
             })
           ) : (
             <Box width="100%">
@@ -294,10 +425,8 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box >
-
-
-    </ScrollView >
+      </Box>
+    </ScrollView>
   );
 };
 

@@ -7,7 +7,7 @@ import { Dimensions, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
 
-const DetailtEventListScreen = ({ route }) => {
+const DetailtKegiatanListScreen = ({ route }) => {
 
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(true);
@@ -16,7 +16,7 @@ const DetailtEventListScreen = ({ route }) => {
     const getListEvent = () => {
         axios
             .get(
-                `${BASE_URL}/api/event/kategori/${route.params.id}/status/${route.params.status}`,
+                `${BASE_URL}/api/event/online/${route.params.jenis}`,
             )
             .then(response => response.data)
             .then(data => {
@@ -116,4 +116,4 @@ const DetailtEventListScreen = ({ route }) => {
         </ScrollView >
     )
 };
-export default DetailtEventListScreen;
+export default DetailtKegiatanListScreen;

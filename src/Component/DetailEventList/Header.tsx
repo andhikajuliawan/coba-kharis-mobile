@@ -29,6 +29,7 @@ const Header = () => {
 
     return (
         <View style={styles.container}>
+
             <View style={styles.space1}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Back width={scale(28)} height={scale(28)} />

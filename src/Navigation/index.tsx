@@ -41,7 +41,7 @@ import StreamingScreen from '../Screen/StreamingScreen';
 import EventListScreen from '../Screen/EventListScreen';
 import DetailEventListScreen from '../Screen/DetailEventListScreen';
 import DetailEventScreen from '../Screen/DetailEventScreen';
-
+import DetailKegiatanListScreen from '../Screen/DetailKegiatanListScreen';
 
 
 
@@ -72,6 +72,7 @@ const Navigation = () => {
             <Stack.Screen name="EventList" component={EventListScreen} />
             <Stack.Screen name="DetailEventList" component={DetailEventListScreen} />
             <Stack.Screen name="DetailEvent" component={DetailEventScreen} />
+            <Stack.Screen name="DetailKegiatanList" component={DetailKegiatanListScreen} />
           </>
         )}
       </Stack.Navigator>
@@ -118,6 +119,7 @@ export function Tabs() {
           height: scale(60),
         },
         headerShown: false,
+        unmountOnBlur: true,
       }}>
       <Tab.Screen
         name="HomeTab"

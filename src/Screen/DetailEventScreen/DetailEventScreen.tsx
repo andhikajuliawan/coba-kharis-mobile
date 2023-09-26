@@ -15,6 +15,7 @@ import Location from '../../../assets/icons/EventDetail/mappin.svg'
 import Person from '../../../assets/icons/EventDetail/person.svg'
 import Money from '../../../assets/icons/EventDetail/giftcard.svg'
 import { format } from "date-fns";
+import InformasiEvent from "../../Component/DetailEvent/InformasiEvent";
 
 
 
@@ -88,31 +89,16 @@ const DetailtEventScreen = ({ route }) => {
                         resizeMode="cover"
                         style={styles.image}
                     />}
-                <ImageBackground source={require('../../../assets/bg/gradientTitle.png')}
-                    resizeMode="cover" >
-                    <Box px={5} my={3} borderTopRadius={20} mt={-10} zIndex={1} bgColor="#fff">
-                        <Text fontSize={24} fontWeight="bold" mb={1} mt={5}>{eventDetail.nama}</Text>
-                        <HStack alignItems="center" >
-                            <Dates width={scale(24)} height={scale(24)} />
-                            <Text ml={1} fontSize={16} mb={1} >{date}</Text>
-                        </HStack>
-                        <HStack alignItems="center" >
-                            <Location width={scale(24)} height={scale(24)} />
-                            <Text ml={1} fontSize={16} mb={1}>{eventDetail.lokasi}</Text>
-                        </HStack>
-                        <HStack justifyContent="space-between" >
-                            <HStack>
-                                <Person width={scale(24)} height={scale(24)} />
-                                <Text ml={1} fontSize={16} >{eventDetail.maksimal_peserta} Pasang</Text>
-                            </HStack>
-                            <HStack>
-                                <Money width={scale(24)} height={scale(24)} />
-                                <Text ml={1} fontSize={16}>Rp.{eventDetail.harga}</Text>
-                            </HStack>
 
-                        </HStack>
-                    </Box>
-                </ImageBackground>
+                {isLoading ? <Spinner /> : <InformasiEvent
+                    nama={eventDetail.nama}
+                    dateStart={eventDetail.tanggal_mulai}
+                    dateEnd={eventDetail.tanggal_selesai}
+                    lokasi={eventDetail.lokasi}
+                    peserta={eventDetail.maksimal_peserta}
+                    harga={eventDetail.harga}
+                />}
+
                 <Box>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} ml={5}>
                         <HStack my={3}>
