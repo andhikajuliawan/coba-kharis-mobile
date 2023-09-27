@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import type { PropsWithChildren } from 'react';
 
 import {
@@ -31,6 +31,8 @@ import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import { Box, Center, Spinner } from 'native-base';
+
+import {AuthContext} from '../../Context/AuthContext';
 
 type SectionProps = PropsWithChildren<{
   text: string;
@@ -94,6 +96,7 @@ const HomeScreen = () => {
   //   }
   // ]);
 
+  const {logout} = useContext(AuthContext);
 
   const jmlMenuDinamis = menu.length;
   const [jmlMenuStatis, setJmlMenuStatis] = useState<any | null>(null);
@@ -832,12 +835,13 @@ const HomeScreen = () => {
         }}>
         <Text style={styles.textEvent}>Recommended Event</Text>
         <TouchableOpacity
+          onPress={() => { logout(); }}
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <Text style={styles.textEventButton}>View all</Text>
+          <Text style={styles.textEventButton}>Log Out</Text>
           <ArrowVButton height={scale(15)} width={scale(7)} />
         </TouchableOpacity>
       </View>

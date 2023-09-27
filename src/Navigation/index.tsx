@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 
 import {
   Text,
@@ -33,6 +33,8 @@ import StreamingInctive from '../../assets/icons/BottomTab/Streaming_Inactive.sv
 // Screen
 import SplashScreen from '../Screen/SplashScreen';
 
+import SignInScreen from '../Screen/SignInScreen';
+
 import HomeScreen from '../Screen/HomeScreen';
 import KegiatanScreen from '../Screen/KegiatanScreen';
 import MitraKharisScreen from '../Screen/MitraKharisScreen';
@@ -44,14 +46,17 @@ import DetailEventScreen from '../Screen/DetailEventScreen';
 import DetailKegiatanListScreen from '../Screen/DetailKegiatanListScreen';
 import DetailGroupListScreen from '../Screen/DetailGroupListScreen';
 
-
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
+
+import {AuthContext} from '../Context/AuthContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
+  const {userInfo, splashLoading} = useContext(AuthContext);
+
   const [HideSplash, setHideSplash] = useState(true);
 
   useEffect(() => {
@@ -64,9 +69,9 @@ const Navigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {HideSplash ? (
-          <Stack.Screen name="Home" component={SplashScreen} />
-        ) : (
+        {splashLoading ? (
+          <Stack.Screen name="SplashScreen" component={SplashScreen} />
+        ) : userInfo.token ? (
           <>
             <Stack.Screen name="Home" component={Tabs} />
             <Stack.Screen name="EventList" component={EventListScreen} />
@@ -74,6 +79,10 @@ const Navigation = () => {
             <Stack.Screen name="DetailEvent" component={DetailEventScreen} />
             <Stack.Screen name="DetailKegiatanList" component={DetailKegiatanListScreen} />
             <Stack.Screen name="DetailGroupList" component={DetailGroupListScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="SignIn" component={SignInScreen} />
           </>
         )}
       </Stack.Navigator>
