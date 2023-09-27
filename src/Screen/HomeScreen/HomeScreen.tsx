@@ -30,6 +30,7 @@ import YoutubeThumbnail from '../../Component/Home/Thumbnail';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
+import { Box, Center, Spinner } from 'native-base';
 
 type SectionProps = PropsWithChildren<{
   text: string;
@@ -46,6 +47,8 @@ const LimitText = ({ text, limit }: SectionProps) => {
 const HomeScreen = () => {
   // Navigation init
   const navigation = useNavigation();
+  const [contentYoutube, setContentYoutube] = useState([])
+  const [isLoadingYoutube, setIsLoadingYoutube] = useState(true)
 
   // State untuk informasi user
   const [userInfo] = useState({
@@ -226,11 +229,20 @@ const HomeScreen = () => {
         let menu = response.data.categories;
         setMenu(menu)
       })
-      .then(() => console.log(menu))
       .catch((err) => {
         console.log(err);
       })
   };
+  const getContentYoutube = () => {
+    axios.get(`${BASE_URL}/api/event/content/youtube/take/1`)
+      .then((response) => response.data)
+      .then((data => setContentYoutube(data.data)))
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => setIsLoadingYoutube(false))
+  };
+
 
   // UseEffect
   useEffect(() => {
@@ -241,8 +253,8 @@ const HomeScreen = () => {
       const menuStatis = 0;
       setJmlMenuStatis(menuStatis);
     }
-
     getCategories();
+    getContentYoutube();
     return () => { };
   }, [jmlMenuDinamis]);
 
@@ -252,6 +264,9 @@ const HomeScreen = () => {
 
   const onPressKategori = (kategori) => {
     navigation.navigate('EventList', { kategori: kategori });
+  }
+  const onPressGroup = (group) => {
+    navigation.navigate('DetailGroupList', { group: group });
   }
 
   return (
@@ -477,15 +492,15 @@ const HomeScreen = () => {
 
       {/* Thumbnail Youtube */}
       <View>
-        {liveYoutube.map((thumb, index) => (
+        {isLoadingYoutube ? <Spinner /> : contentYoutube.map((thumb, index) => (
           <>
             <YoutubeThumbnail
               tumbInfo={thumb}
               key={index}
-              logo={thumb.event.logo}
             />
           </>
-        ))}
+        ))
+        }
       </View>
 
       <ScrollView
@@ -534,6 +549,7 @@ const HomeScreen = () => {
                 Temukan visi Allah untuk membangun keluarga terang
               </Text>
               <TouchableOpacity
+                onPress={() => onPressGroup('family')}
                 style={{
                   backgroundColor: '#502C0D',
                   borderRadius: scale(20),
@@ -597,6 +613,7 @@ const HomeScreen = () => {
                 Jelajahi keindahan pernikahan dengan kasih Allah
               </Text>
               <TouchableOpacity
+                onPress={() => onPressGroup('marriage')}
                 style={{
                   backgroundColor: '#A4161A',
                   borderRadius: scale(20),
@@ -660,6 +677,7 @@ const HomeScreen = () => {
                 Kenali visi Allah sebelum memasuki pernikahan kudus
               </Text>
               <TouchableOpacity
+                onPress={() => onPressGroup('wedding')}
                 style={{
                   backgroundColor: '#00528C',
                   borderRadius: scale(20),
@@ -723,6 +741,7 @@ const HomeScreen = () => {
                 Terapkan hikmat dari Tuhan untuk mendidik generasi muda
               </Text>
               <TouchableOpacity
+                onPress={() => onPressGroup('parents')}
                 style={{
                   backgroundColor: '#347361',
                   borderRadius: scale(20),
@@ -786,6 +805,7 @@ const HomeScreen = () => {
                 Pesan Tuhan bagi generasi muda dalam membangun hubungan
               </Text>
               <TouchableOpacity
+                onPress={() => onPressGroup('youth-gen')}
                 style={{
                   backgroundColor: '#D97A07',
                   borderRadius: scale(20),

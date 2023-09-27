@@ -115,8 +115,7 @@ const DetailtEventScreen = ({ route }) => {
                                                 <Box mr={3}>
                                                     <ImageBackground source={{ uri: `${item.thumbnail}` }} alt="youtube" width={windowWidth * (50 / 100)} height={windowWidth * (30 / 100)}
                                                         borderRadius={5} key={index}>
-                                                        <Center width={windowWidth * (50 / 100)} height={windowWidth * (30 / 100)} mr={2}
-                                                            mr={2}>
+                                                        <Center width={windowWidth * (50 / 100)} height={windowWidth * (30 / 100)} mr={2}>
                                                             <Image source={require('../../../assets/logo/youtube.png')} width={windowWidth * (10 / 100)} height={windowWidth * (7 / 100)} alt="youtube" />
                                                         </Center>
                                                     </ImageBackground>

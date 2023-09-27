@@ -42,7 +42,7 @@ import EventListScreen from '../Screen/EventListScreen';
 import DetailEventListScreen from '../Screen/DetailEventListScreen';
 import DetailEventScreen from '../Screen/DetailEventScreen';
 import DetailKegiatanListScreen from '../Screen/DetailKegiatanListScreen';
-
+import DetailGroupListScreen from '../Screen/DetailGroupListScreen';
 
 
 import { ScaledSheet } from 'react-native-size-matters';
@@ -73,6 +73,7 @@ const Navigation = () => {
             <Stack.Screen name="DetailEventList" component={DetailEventListScreen} />
             <Stack.Screen name="DetailEvent" component={DetailEventScreen} />
             <Stack.Screen name="DetailKegiatanList" component={DetailKegiatanListScreen} />
+            <Stack.Screen name="DetailGroupList" component={DetailGroupListScreen} />
           </>
         )}
       </Stack.Navigator>
