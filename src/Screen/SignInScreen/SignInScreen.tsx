@@ -35,7 +35,7 @@ const SignInScreen = () => {
  
 
   const onSubmitPressed = () => {
-    navigation.navigate('Home');
+    navigation.navigate('SignUp');
   };
 
 //   const onResetPasswordPressed = () => {
@@ -48,11 +48,12 @@ const SignInScreen = () => {
 
   return (
     <ScrollView>
-        <Box>
+        <Box marginY={10}>
             {/* Logo */}
             <Center>
                 <VStack alignItems="center">
                     <Image
+                        source={require('../../../assets/logo/logoKharis.png')}
                         alt="Alternate Text"
                         size="md"
                         marginY={5}
@@ -134,7 +135,7 @@ const SignInScreen = () => {
                         Don't have a account ? 
                     </Text>
                     <Text
-                        // onPress={onPressText}
+                        onPress={onSubmitPressed}
                         color="#3EADE2"
                         fontFamily="Poppins-Bold"
                         fontSize={14}
