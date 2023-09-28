@@ -16,6 +16,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
@@ -49,6 +50,9 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [contentYoutube, setContentYoutube] = useState([])
   const [isLoadingYoutube, setIsLoadingYoutube] = useState(true)
+  const [isLoadingRecommendEvent, setIsLoadingRecommendEvent] = useState(true)
+  const [recommendEvent, setRecommendEvent] = useState([])
+
 
   // State untuk informasi user
   const [userInfo] = useState({
@@ -242,6 +246,19 @@ const HomeScreen = () => {
       })
       .finally(() => setIsLoadingYoutube(false))
   };
+  const getRecommendEvent = () => {
+    axios.get(`${BASE_URL}/api/event`)
+      .then((response) => response.data)
+      .then((data => setRecommendEvent(data.data)))
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => setIsLoadingRecommendEvent(false))
+  }
+
+  const onPressDetailEvent = (id) => {
+    navigation.navigate('DetailEvent', { id: id })
+  }
 
 
   // UseEffect
@@ -255,6 +272,7 @@ const HomeScreen = () => {
     }
     getCategories();
     getContentYoutube();
+    getRecommendEvent();
     return () => { };
   }, [jmlMenuDinamis]);
 
@@ -845,28 +863,32 @@ const HomeScreen = () => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         style={{ marginVertical: scale(15), paddingHorizontal: scale(15) }}>
-        {recomEvent.map((imageEvent, index) => (
-          <>
+        {isLoadingRecommendEvent ? <Spinner /> :
+          recommendEvent.map((recommendEvent, index) => (
+
             <TouchableOpacity
               style={{
                 borderRadius: scale(10),
                 maxHeight: scale(160),
                 maxWidth: scale(160),
                 marginRight: scale(10),
-              }}>
+              }} onPress={() => onPressDetailEvent(recommendEvent.id)}>
               <Image
-                source={imageEvent.image}
+                source={{
+                  uri: `${BASE_URL}/storage/files/event-media/${recommendEvent.event_media[0].file}`,
+                }}
                 resizeMode="contain"
                 style={{
                   borderRadius: scale(10),
-                  maxHeight: scale(160),
-                  maxWidth: scale(160),
+                  height: scale(160),
+                  width: scale(160),
                   marginRight: scale(10),
                 }}
               />
+              <Text>{recommendEvent.nama}</Text>
             </TouchableOpacity>
-          </>
-        ))}
+
+          ))}
         <View style={{ marginRight: scale(15) }}></View>
       </ScrollView>
     </ScrollView>

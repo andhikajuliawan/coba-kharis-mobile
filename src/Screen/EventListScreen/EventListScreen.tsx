@@ -65,7 +65,10 @@ const EventListScreen = ({ route }) => {
       .catch(err => {
         console.log(err);
       })
-      .finally(() => setIsLoadingOpen(false));
+      .finally(() => {
+        setIsLoadingOpen(false)
+        // console.log(bannerOpen)
+      });
   };
   const getListEventClose = () => {
     axios
@@ -214,11 +217,11 @@ const EventListScreen = ({ route }) => {
         <Flex direction="row" flexWrap="wrap" px={5}>
           {isLoadingOpen ? (
             <Spinner color="indigo.500" flex={1} />
-          ) : bannerOpen != 0 ? (
+          ) : bannerOpen ? (
             <Box width="100%" m={2}>
               <TouchableOpacity
                 onPress={() => onPressDetailEvent(bannerOpen.id)}>
-                {bannerOpen.event_media[0] ? (
+                {bannerOpen.event_media ? (
                   bannerOpen.event_media[0].jenis == 'image' ? (
                     <Image
                       source={{
@@ -242,7 +245,7 @@ const EventListScreen = ({ route }) => {
                   )
                 ) : (
                   <Box width="100%" height={windowHeight * (20 / 100)}>
-                    {' '}
+
                     <Center>no Image</Center>
                   </Box>
                 )}
@@ -265,18 +268,19 @@ const EventListScreen = ({ route }) => {
             <Spinner color="indigo.500" flex={1} />
           ) : eventByOpen.length != 0 ? (
             eventByOpen.map(function (open, index) {
-              let getImage = [];
-              for (let i = 0; i < open.event_media.length; i++) {
-                if (open.event_media[i].utama == 1) {
-                  getImage.push(open.event_media[i]);
-                }
-              }
-              if (getImage.length != 0) {
-                if (open.event_media.jenis == 'image') {
+              // console.log(open.event_media[0].file)
+              // let getImage = [];
+              // for (let i = 0; i < open.event_media.length; i++) {
+              //   if (open.event_media[i].utama == 1) {
+              //     getImage.push(open.event_media[i]);
+              //   }
+              // }
+              if (open.event_media.length != 0) {
+                if (open.event_media[0].jenis == 'image') {
                   var image = (
                     <Image
                       source={{
-                        uri: `${BASE_URL}/storage/files/event-media/${open.event_media.file}`,
+                        uri: `${BASE_URL}/storage/files/event-media/${open.event_media[0].file}`,
                       }}
                       width="100%"
                       alt="image"
@@ -288,7 +292,7 @@ const EventListScreen = ({ route }) => {
                 } else {
                   var image = (
                     <Image
-                      source={{ uri: `${open.event_media.thumbnail}` }}
+                      source={{ uri: `${open.event_media[0].thumbnail}` }}
                       width="100%"
                       alt="image"
                       height={windowHeight * (15 / 100)}
@@ -335,10 +339,10 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box>
+      </Box >
 
       {/* Last event */}
-      <Box>
+      < Box >
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
             Last Event
@@ -425,8 +429,8 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box>
-    </ScrollView>
+      </Box >
+    </ScrollView >
   );
 };
 
