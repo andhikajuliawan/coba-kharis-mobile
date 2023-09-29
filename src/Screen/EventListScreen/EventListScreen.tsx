@@ -17,11 +17,12 @@ import SearchInput from '../../../assets/icons/EvenList/Header/Search-Input.svg'
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
+import { AuthContext } from '../../Context/AuthContext';
 
 const EventListScreen = ({ route }) => {
   // Navigation init
@@ -34,10 +35,14 @@ const EventListScreen = ({ route }) => {
   const [eventByPencarian, setEventByPencarian] = useState([]);
   const [isLoadingOpen, setIsLoadingOpen] = useState(true);
   const [isLoadingClose, setIsLoadingClose] = useState(true);
+  const { userInfo } = useContext(AuthContext);
+
 
   const getListEvent = () => {
     axios
-      .get(`${BASE_URL}/api/event/kategori/${route.params.kategori.id}`)
+      .get(`${BASE_URL}/api/event/kategori/${route.params.kategori.id}`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      })
       .then(response => response.data)
       .then(data => {
         setListEvent(data.data);
@@ -51,7 +56,9 @@ const EventListScreen = ({ route }) => {
   const getListEventOpen = () => {
     axios
       .get(
-        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/open`,
+        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/open`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -65,12 +72,17 @@ const EventListScreen = ({ route }) => {
       .catch(err => {
         console.log(err);
       })
-      .finally(() => setIsLoadingOpen(false));
+      .finally(() => {
+        setIsLoadingOpen(false)
+        // console.log(bannerOpen)
+      });
   };
   const getListEventClose = () => {
     axios
       .get(
-        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/close`,
+        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/close`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -140,7 +152,7 @@ const EventListScreen = ({ route }) => {
 
   return (
     <ScrollView bgColor="#fff">
-      <Header />
+      <Header back={true} />
 
       <Input
         placeholder={'Cari ' + route.params.kategori.nama + ' ...'}
@@ -155,11 +167,11 @@ const EventListScreen = ({ route }) => {
       <Box mx={5}>
         {setEventByPencarian != 0 ? (
           eventByPencarian.map((pencarian, index) => {
-            if (pencarian.event_media.jenis == 'image') {
+            if (pencarian.event_media[0].jenis == 'image') {
               var image = (
                 <Image
                   source={{
-                    uri: `${BASE_URL}/storage/files/event-media/${pencarian.event_media.file}`,
+                    uri: `${BASE_URL}/storage/files/event-media/${pencarian.event_media[0].file}`,
                   }}
                   width="100%"
                   alt="image"
@@ -171,7 +183,7 @@ const EventListScreen = ({ route }) => {
             } else {
               var image = (
                 <Image
-                  source={{ uri: `${pencarian.event_media.thumbnail}` }}
+                  source={{ uri: `${pencarian.event_media[0].thumbnail}` }}
                   width="100%"
                   alt="image"
                   height={windowHeight * (15 / 100)}
@@ -180,13 +192,18 @@ const EventListScreen = ({ route }) => {
                 />
               );
             }
+            let dateStart = new Date(pencarian.tanggal_mulai);
+            let dateEnd = new Date(pencarian.tanggal_selesai);
+            let formatDateStart = format(dateStart, "dd");
+            let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+            let displayDate = `${formatDateStart} - ${formatDateEnd}`
             return (
               <Box width="45%" m={2} key={index}>
                 <TouchableOpacity
                   onPress={() => onPressDetailEvent(pencarian.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {pencarian.tanggal_mulai}
+                    {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
                     {pencarian.nama}
@@ -214,11 +231,11 @@ const EventListScreen = ({ route }) => {
         <Flex direction="row" flexWrap="wrap" px={5}>
           {isLoadingOpen ? (
             <Spinner color="indigo.500" flex={1} />
-          ) : bannerOpen != 0 ? (
+          ) : bannerOpen ? (
             <Box width="100%" m={2}>
               <TouchableOpacity
                 onPress={() => onPressDetailEvent(bannerOpen.id)}>
-                {bannerOpen.event_media[0] ? (
+                {bannerOpen.event_media ? (
                   bannerOpen.event_media[0].jenis == 'image' ? (
                     <Image
                       source={{
@@ -226,7 +243,7 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 100)}
+                      height={windowHeight * (20 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -242,7 +259,7 @@ const EventListScreen = ({ route }) => {
                   )
                 ) : (
                   <Box width="100%" height={windowHeight * (20 / 100)}>
-                    {' '}
+
                     <Center>no Image</Center>
                   </Box>
                 )}
@@ -265,22 +282,23 @@ const EventListScreen = ({ route }) => {
             <Spinner color="indigo.500" flex={1} />
           ) : eventByOpen.length != 0 ? (
             eventByOpen.map(function (open, index) {
-              let getImage = [];
-              for (let i = 0; i < open.event_media.length; i++) {
-                if (open.event_media[i].utama == 1) {
-                  getImage.push(open.event_media[i]);
-                }
-              }
-              if (getImage.length != 0) {
-                if (open.event_media.jenis == 'image') {
+              // console.log(open.event_media[0].file)
+              // let getImage = [];
+              // for (let i = 0; i < open.event_media.length; i++) {
+              //   if (open.event_media[i].utama == 1) {
+              //     getImage.push(open.event_media[i]);
+              //   }
+              // }
+              if (open.event_media.length != 0) {
+                if (open.event_media[0].jenis == 'image') {
                   var image = (
                     <Image
                       source={{
-                        uri: `${BASE_URL}/storage/files/event-media/${open.event_media.file}`,
+                        uri: `${BASE_URL}/storage/files/event-media/${open.event_media[0].file}`,
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 100)}
+                      height={windowHeight * (18 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -288,7 +306,7 @@ const EventListScreen = ({ route }) => {
                 } else {
                   var image = (
                     <Image
-                      source={{ uri: `${open.event_media.thumbnail}` }}
+                      source={{ uri: `${open.event_media[0].thumbnail}` }}
                       width="100%"
                       alt="image"
                       height={windowHeight * (15 / 100)}
@@ -335,10 +353,10 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box>
+      </Box >
 
       {/* Last event */}
-      <Box>
+      < Box >
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
             Last Event
@@ -369,7 +387,7 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 10)}
+                      height={windowHeight * (18 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -425,8 +443,8 @@ const EventListScreen = ({ route }) => {
             </Box>
           )}
         </Flex>
-      </Box>
-    </ScrollView>
+      </Box >
+    </ScrollView >
   );
 };
 

@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import type { PropsWithChildren } from 'react';
 
 import {
@@ -34,7 +34,9 @@ import Header from '../../Component/Header';
 import Search from '../../../assets/icons/Header/Search.svg';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
-import { Spinner } from 'native-base';
+import { Box, Center, Spinner } from 'native-base';
+import { AuthContext } from '../../Context/AuthContext';
+import { format } from 'date-fns';
 
 type SectionProps = PropsWithChildren<{
   text: string;
@@ -230,12 +232,17 @@ const StreamingScreen = () => {
   const [contentYoutube, setContentYoutube] = useState([]);
   const [contentPodcast, setContentPodcast] = useState([]);
   const [contentYoutubeByCategory, setContentYoutubeByCategory] = useState([]);
+  const [contentUpComingLiveStreaming, setContentUpComingLiveStreaming] = useState([]);
+  const [eventByPencarian, setEventByPencarian] = useState([]);
   const [kategori, setKategori] = useState(3);
   const [listKategori, setListKategori] = useState([]);
   const [isLoadingYoutube, setIsLoadingYoutube] = useState(true);
   const [isLoadingContentYoutubeByCategory, setIsLoadingContentYoutubeByCategory] = useState(true);
+  const [isLoadingContentUpComingLiveStreaming, setIsLoadingContentUpComingLiveStreaming] = useState(true);
   const [isLoadingListKategori, setIsLoadingListKategori] = useState(true);
   const [hideKategori, setHideKategori] = useState(true);
+  const [inputPencarian, setInputPencarian] = useState('');
+  const { userInfo } = useContext(AuthContext);
 
   // State untuk thumbnail Streaming (Harus di set 1 Inputan)
   const [nowLive, setNowLive] = useState({
@@ -253,50 +260,50 @@ const StreamingScreen = () => {
 
   const [menu, setMenu] = useState([
     {
-      "id": 2,
+      "id": 3,
       "logo": require("../../../assets/icons/Home/Menu/Menu_2.png"),
       "title": "Godly Family",
       "streaming": true,
     },
     {
-      "id": 3,
+      "id": 4,
       "logo": require("../../../assets/icons/Home/Menu/Menu_3.png"),
       "title": "Marriage Enrichment",
       "streaming": false,
     },
     {
-      "id": 4,
+      "id": 5,
       "logo": require("../../../assets/icons/Home/Menu/Menu_4.png"),
       "title": "Growing Couple",
       "streaming": false,
     },
     {
-      "id": 5,
+      "id": 6,
       "logo": require("../../../assets/icons/Home/Menu/Menu_5.png"),
       "title": "Marriage Spiritual Transformation Class",
       "streaming": false,
     },
     {
-      "id": 6,
+      "id": 7,
       "logo": require("../../../assets/icons/Home/Menu/Menu_6.png"),
       "title": "Pre Marital Class",
       "streaming": false,
     },
     {
-      "id": 7,
+      "id": 8,
       "logo": require("../../../assets/icons/Home/Menu/Menu_7.png"),
       "title": "Shining Generation Class",
       "streaming": false,
     },
     {
-      "id": 8,
+      "id": 9,
       "logo": require("../../../assets/icons/Home/Menu/Menu_16.png"),
       "title": "Wisdom For Family",
       "streaming": true,
     },
   ])
 
-  const [field, onChangeField] = useState('');
+
 
   const [status, setStatus] = useState('Godly Family')
   const setStatusFilter = (status: React.SetStateAction<string>) => {
@@ -304,7 +311,9 @@ const StreamingScreen = () => {
   }
 
   const getContentYoutube = () => {
-    axios.get(`${BASE_URL}/api/event/content/youtube/take/1`)
+    axios.get(`${BASE_URL}/api/event/content/youtube/take/1`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => setContentYoutube(data.data)))
       .catch((err) => {
@@ -317,7 +326,9 @@ const StreamingScreen = () => {
 
   const getContentYoutubeByCategory = (kategori) => {
     setIsLoadingContentYoutubeByCategory(true)
-    axios.get(`${BASE_URL}/api/event/streaming/${kategori}/content/youtube`)
+    axios.get(`${BASE_URL}/api/event/streaming/${kategori}/content/youtube`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => {
         if (data.data.length) {
@@ -335,9 +346,29 @@ const StreamingScreen = () => {
         setIsLoadingContentYoutubeByCategory(false)
       })
   }
+  const getContentUpComingLiveStreaming = (kategori) => {
+    setIsLoadingContentUpComingLiveStreaming(true)
+    axios.get(`${BASE_URL}/api/event/upcoming/open/streaming/${kategori}/content/youtube`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
+      .then((response) => response.data)
+      .then((data => {
+        if (data.data.length) {
+          setContentUpComingLiveStreaming(data.data);
+        } else { }
+      }))
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setIsLoadingContentUpComingLiveStreaming(false)
+      })
+  }
 
   const getCategory = () => {
-    axios.get(`${BASE_URL}/api/event-categories`)
+    axios.get(`${BASE_URL}/api/event-categories`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => setListKategori(data.categories)))
       .catch((err) => {
@@ -349,7 +380,9 @@ const StreamingScreen = () => {
   }
 
   const getContentPodcast = () => {
-    axios.get(`${BASE_URL}/api/media/content/spotify`)
+    axios.get(`${BASE_URL}/api/media/content/spotify`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => setContentPodcast(data.data)))
       .catch((err) => {
@@ -363,7 +396,9 @@ const StreamingScreen = () => {
   const changeCategory = (id) => {
     setKategori(id)
     setIsLoadingContentYoutubeByCategory(true)
-    axios.get(`${BASE_URL}/api/event/streaming/${id}/content/youtube`)
+    axios.get(`${BASE_URL}/api/event/streaming/${id}/content/youtube`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => {
         if (data.data.length) {
@@ -381,12 +416,54 @@ const StreamingScreen = () => {
       })
       .finally(() => {
         setIsLoadingContentYoutubeByCategory(false)
+        changeUpcomingLiveStreaming(id)
       })
   }
+
+  const changeUpcomingLiveStreaming = (id) => {
+    setIsLoadingContentUpComingLiveStreaming(true)
+    axios.get(`${BASE_URL}/api/event/upcoming/open/streaming/${id}/content/youtube`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
+      .then((response) => response.data)
+      .then((data => {
+        setContentUpComingLiveStreaming(data.data);
+      }))
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setIsLoadingContentUpComingLiveStreaming(false)
+        console.log(contentUpComingLiveStreaming)
+      })
+  }
+
+  const InputPencarian = pencarian => {
+    // Check if searched text is not blank
+    if (pencarian) {
+      // Inserted text is not blank
+      // Filter the masterDataSource and update FilteredDataSource
+      const newData = contentUpComingLiveStreaming.filter(function (item) {
+        // Applying filter for the inserted text in search bar
+        const itemData = item.nama ? item.nama.toUpperCase() : ''.toUpperCase();
+        const textData = pencarian.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setEventByPencarian(newData);
+      console.log(newData);
+      setInputPencarian(pencarian);
+    } else {
+      // Inserted text is blank
+      // Update FilteredDataSource with masterDataSource
+      setEventByPencarian([]);
+      setInputPencarian(pencarian);
+    }
+  };
 
   useEffect(() => {
     getContentYoutube();
     getContentYoutubeByCategory(kategori);
+    getContentUpComingLiveStreaming(kategori);
     getCategory();
     getContentPodcast();
 
@@ -453,8 +530,8 @@ const StreamingScreen = () => {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: scale(15), paddingHorizontal: scale(15), }}>
           <TextInput
             style={styles.input}
-            onChangeText={onChangeField}
-            value={field}
+            onChangeText={pencarian => InputPencarian(pencarian)}
+            value={inputPencarian}
             placeholder="Cari judul acara atau nama pembicara"
           />
           <TouchableOpacity style={{ backgroundColor: '#3A0CA3', height: scale(40), width: scale(40), borderRadius: scale(5), alignItems: 'center', justifyContent: 'center' }}>
@@ -462,9 +539,61 @@ const StreamingScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {setEventByPencarian != 0 ? (
+          eventByPencarian.map((pencarian, index) => {
+            if (pencarian.event_media[0].jenis == 'image') {
+              var image = (
+                <Image
+                  source={{
+                    uri: `${BASE_URL}/storage/files/event-media/${pencarian.event_media[0].file}`,
+                  }}
+                  width="100%"
+                  alt="image"
+                  height={windowHeight * (15 / 100)}
+                  borderRadius={10}
+                  resizeMode="cover"
+                />
+              );
+            } else {
+              var image = (
+                <Image
+                  source={{ uri: `${pencarian.event_media[0].thumbnail}` }}
+                  width="100%"
+                  alt="image"
+                  height={windowHeight * (15 / 100)}
+                  borderRadius={10}
+                  resizeMode="contain"
+                />
+              );
+            }
+            let dateStart = new Date(pencarian.tanggal_mulai);
+            let dateEnd = new Date(pencarian.tanggal_selesai);
+            let formatDateStart = format(dateStart, "dd");
+            let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+            let displayDate = `${formatDateStart} - ${formatDateEnd}`
+            return (
+              <Box width="45%" m={2} key={index} mx={5}>
+                <TouchableOpacity
+                // onPress={() => onPressDetailEvent(pencarian.id)}
+                >
+                  {image}
+                  <Text color="#A6ADB5" my={2}>
+                    {displayDate}
+                  </Text>
+                  <Text fontWeight="bold" fontSize={16}>
+                    {pencarian.nama}
+                  </Text>
+                </TouchableOpacity>
+              </Box>
+            );
+          })
+        ) : (
+          <></>
+        )}
+
         {/* Button */}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', maxWidth: '100%', flexWrap: 'wrap', paddingHorizontal: scale(15), }}>
-          {hideKategori ?
+          {/* {hideKategori ?
             listKategori.slice(0, 2).map((listMenu, index) => (
               <TouchableOpacity style={[styles.elevation, (kategori === listMenu.id) ? (styles.buttonMenuActive) : (styles.buttonMenuInactive)]}
                 onPress={() => {
@@ -505,10 +634,14 @@ const StreamingScreen = () => {
                 <LimitText text={listMenu.nama} limit={10} custom={[(kategori === listMenu.id) ? (styles.textMenuActive) : (styles.textMenuInactive)]} />
               </TouchableOpacity>
             ))
-          }
-          {/* {menu.map((listMenu, index) => (
+          } */}
+          {menu.map((listMenu, index) => (
             (listMenu.streaming == true ? (
-              <TouchableOpacity style={[styles.elevation, (status === listMenu.title) ? (styles.buttonMenuActive) : (styles.buttonMenuInactive)]} onPress={() => setStatusFilter((listMenu.title))}>
+              <TouchableOpacity style={[styles.elevation, (status === listMenu.title) ? (styles.buttonMenuActive) : (styles.buttonMenuInactive)]}
+                onPress={() => {
+                  setStatusFilter(listMenu.title)
+                  changeCategory(listMenu.id)
+                }}>
                 <Image
                   source={listMenu.logo}
                   resizeMode='contain'
@@ -522,7 +655,7 @@ const StreamingScreen = () => {
             ) : (
               null
             ))
-          ))} */}
+          ))}
 
           {/* Statis */}
           <TouchableOpacity style={[styles.elevation, (status === 'Audio Podcast') ? (styles.buttonMenuActive) : (styles.buttonMenuInactive)]} onPress={() => setStatusFilter('Audio Podcast')}>
@@ -539,7 +672,15 @@ const StreamingScreen = () => {
 
           {/* Tombol Lainnya */}
           {hideKategori ?
-            <TouchableOpacity style={[styles.buttonMenuInactive, styles.elevation]} onPress={() => setHideKategori(false)}>
+            // <TouchableOpacity style={[styles.buttonMenuInactive, styles.elevation]} onPress={() =>
+            //   // setHideKategori(false)
+            //   changeCategory(0)
+            // }>
+            <TouchableOpacity style={[styles.elevation, (status === 'lainnya') ? (styles.buttonMenuActive) : (styles.buttonMenuInactive)]}
+              onPress={() => {
+                setStatusFilter('lainnya')
+                changeCategory(0)
+              }}>
               <Image
                 source={require("../../../assets/icons/Home/Menu/Menu_17.png")}
                 resizeMode='contain'
@@ -548,7 +689,7 @@ const StreamingScreen = () => {
                   maxWidth: scale(42),
                 }}
               />
-              <LimitText text={'Lainnya'} limit={18} custom={styles.textMenuInactive} />
+              <LimitText text={'Lainnya'} limit={18} custom={[(status === 'lainnya') ? (styles.textMenuActive) : (styles.textMenuInactive)]} />
             </TouchableOpacity>
             :
             <TouchableOpacity style={[styles.buttonMenuInactive, styles.elevation]} onPress={() => setHideKategori(true)}>
@@ -593,49 +734,76 @@ const StreamingScreen = () => {
             <View style={{ justifyContent: 'flex-start', marginTop: scale(5), marginBottom: scale(15), paddingHorizontal: scale(15), }}>
               <Text style={styles.textSubMenu}>Upcoming Live Streaming</Text>
             </View>
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{ height: scale(310), flexDirection: 'row', paddingHorizontal: scale(15), }}>
-              <View style={{ justifyContent: 'space-between', flexDirection: 'column', marginRight: scale(15) }}>
-                <Image
-                  source={require("../../../assets/bg/Feed/Magnificat.png")}
-                  resizeMode='contain'
-                  style={{
-                    borderRadius: scale(10),
-                    maxHeight: scale(180),
-                    maxWidth: scale(180),
-                  }}
-                />
-                <View>
-                  <Text style={styles.textTanggal}>4 - 6 November 2023</Text>
-                  <LimitText text={'Bantal Keluarga - Godly Family Kharis Godly Family Kharis Godly Family Kharis'} limit={56} custom={styles.textJudulStreaming} />
-                  <LimitText text={'dr. Nur Flora Nita TB Sinaga, Sp.OT'} limit={36} custom={styles.textPembicara} />
-                </View>
-                <TouchableOpacity style={styles.buttonRememberInactive}>
-                  <Text style={styles.textRememberInactive}>Ingatkan Saya</Text>
-                </TouchableOpacity>
-              </View>
+            {contentUpComingLiveStreaming.length == 0 ? <Center>belum ada</Center> : <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={{ height: scale(310), flexDirection: 'row', paddingHorizontal: scale(15), }}>
+              {isLoadingContentUpComingLiveStreaming ? <Spinner /> : contentUpComingLiveStreaming.map((upcoming, index) => {
+                if (upcoming.event_media.length != 0) {
+                  if (upcoming.event_media[0].jenis == 'image') {
+                    var image = (
+                      <Image
+                        source={{
+                          uri: `${BASE_URL}/storage/files/event-media/${upcoming.event_media[0].file}`,
+                        }}
+                        alt="image"
+                        resizeMode='contain'
+                        height={windowHeight * (25 / 100)}
+                        widtht={windowWidth * (25 / 100)}
+                      // style={{
+                      //   borderRadius: scale(10),
+                      //   maxHeight: scale(180),
+                      //   maxWidth: scale(180),
+                      // }}
+                      />
+                    );
+                  } else {
+                    var image = (
+                      <Image
+                        source={{ uri: `${upcoming.event_media[0].thumbnail}` }}
+                        alt="image"
+                        resizeMode='contain'
+                        style={{
+                          borderRadius: scale(10),
+                          maxHeight: scale(180),
+                          maxWidth: scale(180),
+                        }}
+                      />
+                    );
+                  }
+                } else {
+                  var image = (
+                    <Box
+                      width="100%"
+                      height={windowHeight * (15 / 100)}
+                      borderRadius={10}>
+                      <Center>no Image</Center>
+                    </Box>
+                  );
+                }
+                let dateStart = new Date(upcoming.tanggal_mulai);
+                let dateEnd = new Date(upcoming.tanggal_selesai);
+                let formatDateStart = format(dateStart, "dd");
+                let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+                let displayDate = `${formatDateStart} - ${formatDateEnd}`
+                return (
+                  <View style={{ justifyContent: 'space-between', flexDirection: 'column', marginRight: scale(15) }}>
+                    {image}
+                    <View>
+                      <Text style={styles.textTanggal}>{displayDate}</Text>
+                      <LimitText text={upcoming.nama} limit={56} custom={styles.textJudulStreaming} />
+                      {upcoming.event_pengisi_acara.length != 0 ?
+                        <LimitText text={upcoming.event_pengisi_acara[0].nama} limit={36} custom={styles.textPembicara} /> : <></>
 
-              <View style={{ justifyContent: 'space-between', flexDirection: 'column', marginRight: scale(15) }}>
-                <Image
-                  source={require("../../../assets/bg/Feed/Magnificat.png")}
-                  resizeMode='contain'
-                  style={{
-                    borderRadius: scale(10),
-                    maxHeight: scale(180),
-                    maxWidth: scale(180),
-                  }}
-                />
-                <View>
-                  <Text style={styles.textTanggal}>4 - 6 November 2023</Text>
-                  <LimitText text={'Bantal Keluarga - Godly Family Kharis Godly Family Kharis Godly Family Kharis'} limit={56} custom={styles.textJudulStreaming} />
-                  <LimitText text={'dr. Nur Flora Nita TB Sinaga, Sp.OT'} limit={36} custom={styles.textPembicara} />
-                </View>
-                <TouchableOpacity style={styles.buttonRememberInactive}>
-                  <Text style={styles.textRememberInactive}>Ingatkan Saya</Text>
-                </TouchableOpacity>
-              </View>
+                      }
+                    </View>
+                    <TouchableOpacity style={styles.buttonRememberInactive}>
+                      <Text style={styles.textRememberInactive}>Ingatkan Saya</Text>
+                    </TouchableOpacity>
+                  </View>)
+              })}
+
               {/* View Padding */}
               <View style={{ marginRight: scale(30) }}></View>
-            </ScrollView>
+            </ScrollView>}
+
 
             {/* Video Lainnya */}
             <View style={{ justifyContent: 'flex-start', marginTop: scale(15), marginBottom: scale(15), paddingHorizontal: scale(15), }}>

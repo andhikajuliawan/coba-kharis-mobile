@@ -16,6 +16,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  RefreshControl,
 } from 'react-native';
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
@@ -32,7 +33,7 @@ import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import { Box, Center, Spinner } from 'native-base';
 
-import {AuthContext} from '../../Context/AuthContext';
+import { AuthContext } from '../../Context/AuthContext';
 
 type SectionProps = PropsWithChildren<{
   text: string;
@@ -51,9 +52,12 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [contentYoutube, setContentYoutube] = useState([])
   const [isLoadingYoutube, setIsLoadingYoutube] = useState(true)
+  const [isLoadingRecommendEvent, setIsLoadingRecommendEvent] = useState(true)
+  const [recommendEvent, setRecommendEvent] = useState([])
+
 
   // State untuk informasi user
-  const [userInfo] = useState({
+  const [usersInfo] = useState({
     name: 'Pdt. Nyoman Widiantara',
   });
   // Menu dinamis diambil dari banyaknya event
@@ -96,7 +100,7 @@ const HomeScreen = () => {
   //   }
   // ]);
 
-  const {logout} = useContext(AuthContext);
+  const { logout, userInfo } = useContext(AuthContext);
 
   const jmlMenuDinamis = menu.length;
   const [jmlMenuStatis, setJmlMenuStatis] = useState<any | null>(null);
@@ -227,7 +231,10 @@ const HomeScreen = () => {
   };
 
   const getCategories = () => {
-    axios.get(`${BASE_URL}/api/event-categories`)
+    console.log(userInfo)
+    axios.get(`${BASE_URL}/api/event-categories`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => {
         let menu = response.data.categories;
         setMenu(menu)
@@ -237,7 +244,9 @@ const HomeScreen = () => {
       })
   };
   const getContentYoutube = () => {
-    axios.get(`${BASE_URL}/api/event/content/youtube/take/1`)
+    axios.get(`${BASE_URL}/api/event/content/youtube/take/1`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => setContentYoutube(data.data)))
       .catch((err) => {
@@ -245,6 +254,21 @@ const HomeScreen = () => {
       })
       .finally(() => setIsLoadingYoutube(false))
   };
+  const getRecommendEvent = () => {
+    axios.get(`${BASE_URL}/api/event`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
+      .then((response) => response.data)
+      .then((data => setRecommendEvent(data.data)))
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => setIsLoadingRecommendEvent(false))
+  }
+
+  const onPressDetailEvent = (id) => {
+    navigation.navigate('DetailEvent', { id: id })
+  }
 
 
   // UseEffect
@@ -258,6 +282,7 @@ const HomeScreen = () => {
     }
     getCategories();
     getContentYoutube();
+    getRecommendEvent();
     return () => { };
   }, [jmlMenuDinamis]);
 
@@ -281,7 +306,7 @@ const HomeScreen = () => {
         <Header />
         <View style={styles.headerHome}>
           <Text style={styles.text_header_1}>Welcome Blessed Family of</Text>
-          <Text style={styles.text_header_2}>{userInfo.name}</Text>
+          <Text style={styles.text_header_2}>{usersInfo.name}</Text>
         </View>
       </ImageBackground>
       <View style={styles.content}>
@@ -849,28 +874,32 @@ const HomeScreen = () => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         style={{ marginVertical: scale(15), paddingHorizontal: scale(15) }}>
-        {recomEvent.map((imageEvent, index) => (
-          <>
+        {isLoadingRecommendEvent ? <Spinner /> :
+          recommendEvent.map((recommendEvent, index) => (
+
             <TouchableOpacity
               style={{
                 borderRadius: scale(10),
                 maxHeight: scale(160),
                 maxWidth: scale(160),
                 marginRight: scale(10),
-              }}>
+              }} onPress={() => onPressDetailEvent(recommendEvent.id)}>
               <Image
-                source={imageEvent.image}
+                source={{
+                  uri: `${BASE_URL}/storage/files/event-media/${recommendEvent.event_media[0].file}`,
+                }}
                 resizeMode="contain"
                 style={{
                   borderRadius: scale(10),
-                  maxHeight: scale(160),
-                  maxWidth: scale(160),
+                  height: scale(160),
+                  width: scale(160),
                   marginRight: scale(10),
                 }}
               />
+              <Text>{recommendEvent.nama}</Text>
             </TouchableOpacity>
-          </>
-        ))}
+
+          ))}
         <View style={{ marginRight: scale(15) }}></View>
       </ScrollView>
     </ScrollView>

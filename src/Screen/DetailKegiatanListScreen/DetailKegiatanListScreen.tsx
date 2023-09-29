@@ -2,21 +2,26 @@ import { Box, Flex, Image, ScrollView, Spinner, Text, Center } from "native-base
 import Header from "../../Component/DetailEventList/Header";
 import axios from "axios";
 import { BASE_URL } from "../../config";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Dimensions, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
+import { AuthContext } from "../../Context/AuthContext";
 
 const DetailtKegiatanListScreen = ({ route }) => {
 
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(true);
     const [listEvent, setListEvent] = useState([]);
+    const { userInfo } = useContext(AuthContext);
+
 
     const getListEvent = () => {
         axios
             .get(
-                `${BASE_URL}/api/event/online/${route.params.jenis}`,
+                `${BASE_URL}/api/event/online/${route.params.jenis}`, {
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+            }
             )
             .then(response => response.data)
             .then(data => {
@@ -47,7 +52,7 @@ const DetailtKegiatanListScreen = ({ route }) => {
         <ScrollView bgColor="#fff">
             <Header />
 
-            <Text m={5} fontSize={18} fontWeight="bold">Kategori : {route.params.kategori} event</Text>
+            <Text m={5} fontSize={18} fontWeight="bold">Kategori : {route.params.jenis} event</Text>
             <Flex direction="row" flexWrap="wrap" px={5}>
                 {isLoading ? (
                     <Spinner color="indigo.500" flex={1} />
@@ -65,7 +70,7 @@ const DetailtKegiatanListScreen = ({ route }) => {
                                     source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
                                     width="100%"
                                     alt='image'
-                                    height={windowHeight * (15 / 100)}
+                                    height={windowHeight * (18 / 100)}
                                     borderRadius={10}
                                     resizeMode="contain"
                                 />

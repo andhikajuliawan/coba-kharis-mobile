@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { Spinner, Text, Flex, Box, Image, ScrollView, Center, Input } from 'native-base';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { BASE_URL } from '../../config';
 import { Dimensions, TouchableOpacity } from 'react-native';
 import { format } from 'date-fns';
 import { useNavigation } from '@react-navigation/native';
 import Header from '../../Component/DetailGroupList/Header';
+import { AuthContext } from '../../Context/AuthContext';
 
 const DetailGroupListScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -13,6 +14,8 @@ const DetailGroupListScreen = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [inputPencarian, setInputPencarian] = useState('');
   const [eventByPencarian, setEventByPencarian] = useState([]);
+  const { userInfo } = useContext(AuthContext);
+
 
   useEffect(() => {
     getGroupList();
@@ -20,7 +23,9 @@ const DetailGroupListScreen = ({ route }) => {
 
   const getGroupList = () => {
     axios
-      .get(`${BASE_URL}/api/event/group/${route.params.group}`)
+      .get(`${BASE_URL}/api/event/group/${route.params.group}`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      })
       .then(response => response.data)
       .then(data => setListEvent(data.data))
       .catch(err => {
@@ -86,7 +91,7 @@ const DetailGroupListScreen = ({ route }) => {
                     }}
                     width="100%"
                     alt="image"
-                    height={windowHeight * (15 / 100)}
+                    height={windowHeight * (18 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
@@ -124,7 +129,7 @@ const DetailGroupListScreen = ({ route }) => {
                   onPress={() => onPressDetailEvent(pencarian.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {pencarian.tanggal_mulai}
+                    {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
                     {pencarian.nama}
@@ -152,7 +157,7 @@ const DetailGroupListScreen = ({ route }) => {
                     }}
                     width="100%"
                     alt="image"
-                    height={windowHeight * (15 / 100)}
+                    height={windowHeight * (18 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
