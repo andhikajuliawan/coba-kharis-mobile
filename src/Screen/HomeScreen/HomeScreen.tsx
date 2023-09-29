@@ -884,7 +884,7 @@ const HomeScreen = () => {
                 maxWidth: scale(160),
                 marginRight: scale(10),
               }} onPress={() => onPressDetailEvent(recommendEvent.id)}>
-              <Image
+              {recommendEvent.event_media.length != 0 ? <Image
                 source={{
                   uri: `${BASE_URL}/storage/files/event-media/${recommendEvent.event_media[0].file}`,
                 }}
@@ -895,7 +895,8 @@ const HomeScreen = () => {
                   width: scale(160),
                   marginRight: scale(10),
                 }}
-              />
+              /> : <Text>No Image</Text>}
+
               <Text>{recommendEvent.nama}</Text>
             </TouchableOpacity>
 

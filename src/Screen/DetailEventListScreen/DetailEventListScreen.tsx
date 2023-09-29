@@ -70,7 +70,7 @@ const DetailtEventListScreen = ({ route }) => {
                                     source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
                                     width="100%"
                                     alt='image'
-                                    height={windowHeight * (15 / 100)}
+                                    height={windowHeight * (20 / 100)}
                                     borderRadius={10}
                                     resizeMode="contain"
                                 />
@@ -79,7 +79,7 @@ const DetailtEventListScreen = ({ route }) => {
                                     source={{ uri: `${getImage[0].thumbnail}` }}
                                     width="100%"
                                     alt='image'
-                                    height={windowHeight * (15 / 100)}
+                                    height={windowHeight * (20 / 100)}
                                     borderRadius={10}
                                     resizeMode="contain"
                                 />
@@ -87,7 +87,7 @@ const DetailtEventListScreen = ({ route }) => {
                         } else {
                             var image = <Box
                                 width="100%"
-                                height={windowHeight * (15 / 100)}
+                                height={windowHeight * (20 / 100)}
                                 borderRadius={10}
                             >
                                 <Center>no Image</Center></Box>

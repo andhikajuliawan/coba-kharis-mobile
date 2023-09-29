@@ -175,7 +175,7 @@ const EventListScreen = ({ route }) => {
                   }}
                   width="100%"
                   alt="image"
-                  height={windowHeight * (15 / 100)}
+                  height={windowHeight * (20 / 100)}
                   borderRadius={10}
                   resizeMode="contain"
                 />
@@ -186,7 +186,7 @@ const EventListScreen = ({ route }) => {
                   source={{ uri: `${pencarian.event_media[0].thumbnail}` }}
                   width="100%"
                   alt="image"
-                  height={windowHeight * (15 / 100)}
+                  height={windowHeight * (20 / 100)}
                   borderRadius={10}
                   resizeMode="contain"
                 />
@@ -243,9 +243,9 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (20 / 100)}
+                      height={windowHeight * (25 / 100)}
                       borderRadius={10}
-                      resizeMode="contain"
+                      resizeMode="fill"
                     />
                   ) : (
                     <Image
@@ -263,9 +263,9 @@ const EventListScreen = ({ route }) => {
                     <Center>no Image</Center>
                   </Box>
                 )}
-                <Text color="#A6ADB5" my={2}>
-                  {bannerOpen.tanggal_mulai}
-                </Text>
+                {/* <Text color="#A6ADB5" my={2}> */}
+                {/* {bannerOpen.tanggal_mulai} */}
+                {/* </Text> */}
                 <Text fontWeight="bold" fontSize={16}>
                   {bannerOpen.nama}
                 </Text>
@@ -298,7 +298,7 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (18 / 100)}
+                      height={windowHeight * (20 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -309,7 +309,7 @@ const EventListScreen = ({ route }) => {
                       source={{ uri: `${open.event_media[0].thumbnail}` }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 100)}
+                      height={windowHeight * (20 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -319,7 +319,7 @@ const EventListScreen = ({ route }) => {
                 var image = (
                   <Box
                     width="100%"
-                    height={windowHeight * (15 / 100)}
+                    height={windowHeight * (20 / 100)}
                     borderRadius={10}>
                     <Center>no Image</Center>
                   </Box>
@@ -335,7 +335,7 @@ const EventListScreen = ({ route }) => {
                 <Box width="45%" m={2} key={index}>
                   <TouchableOpacity onPress={() => onPressDetailEvent(open.id)}>
                     {image}
-                    <Text color="#A6ADB5" my={2}>
+                    <Text color="#A6ADB5" my={2} fontSize={12}>
                       {displayDate}
                     </Text>
                     <Text fontWeight="bold" fontSize={16}>
@@ -387,7 +387,7 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (18 / 100)}
+                      height={windowHeight * (20 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -398,7 +398,7 @@ const EventListScreen = ({ route }) => {
                       source={{ uri: `${getImage[0].thumbnail}` }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 100)}
+                      height={windowHeight * (20 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -408,7 +408,7 @@ const EventListScreen = ({ route }) => {
                 var image = (
                   <Box
                     width="100%"
-                    height={windowHeight * (15 / 100)}
+                    height={windowHeight * (20 / 100)}
                     borderRadius={10}>
                     <Center>no Image</Center>
                   </Box>

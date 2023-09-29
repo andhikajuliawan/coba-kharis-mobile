@@ -1,4 +1,4 @@
-import { Box, Center, Image, HStack, ScrollView, Spinner, Text } from "native-base"
+import { Box, Center, Image, HStack, ScrollView, Spinner, Text, Toast } from "native-base"
 import Header from "../../Component/DetailEvent/Header";
 import { Alert, Dimensions, ImageBackground, Linking, TouchableOpacity, useWindowDimensions } from "react-native"
 import { ScaledSheet } from "react-native-size-matters"
@@ -26,6 +26,7 @@ const DetailtEventScreen = ({ route }) => {
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [date, setDate] = useState('');
+    const [isLoadingDaftarEvent, setIsLoadingDaftarEvent] = useState(false);
     const { userInfo } = useContext(AuthContext);
 
 
@@ -54,6 +55,8 @@ const DetailtEventScreen = ({ route }) => {
     };
 
     const daftarEvent = () => {
+        setIsLoadingDaftarEvent(true)
+
         axios
             .post(
                 `${BASE_URL}/api/daftar-event`, {
@@ -66,11 +69,17 @@ const DetailtEventScreen = ({ route }) => {
                     'Content-Type': 'application/json',
                 },
             },)
-            .then(response => console.log(response.data))
+            .then(response =>
+                // console.log(response.data.message),
+                Toast.show({
+                    description: `${response.data.message}`
+                })
+            )
             .catch(err => {
                 console.log(err);
             })
             .finally(() => {
+                setIsLoadingDaftarEvent(false)
             })
     };
 
@@ -98,22 +107,31 @@ const DetailtEventScreen = ({ route }) => {
         var formattedDate = format(date_start, "dd MMMM yyyy");
     }
 
+    const tagsStyles = {
+        body: {
+            whiteSpace: 'normal',
+            color: '#555F65'
+        },
+    };
+
     return (
         <ScrollView bgColor="#fff">
             <>
                 <Box zIndex={2} >
                     <Header />
                 </Box>
-                {isLoading ? <Spinner /> : eventDetail.event_media[0].jenis == 'image' ?
-                    <ImageBackground
-                        source={{ uri: `${BASE_URL}/storage/files/event-media/${eventDetail.event_media[0].file}` }}
-                        resizeMode="cover"
-                        style={styles.image} /> :
-                    <ImageBackground
-                        source={{ uri: `${eventDetail.event_media[0].thumbnail}` }}
-                        resizeMode="cover"
-                        style={styles.image}
-                    />}
+                {isLoading ? <Spinner /> :
+                    eventDetail.event_media.length != 0 ?
+                        eventDetail.event_media[0].jenis == 'image' ?
+                            <ImageBackground
+                                source={{ uri: `${BASE_URL}/storage/files/event-media/${eventDetail.event_media[0].file}` }}
+                                resizeMode="cover"
+                                style={styles.image} /> :
+                            <ImageBackground
+                                source={{ uri: `${eventDetail.event_media[0].thumbnail}` }}
+                                resizeMode="cover"
+                                style={styles.image}
+                            /> : <></>}
 
                 {isLoading ? <Spinner /> : <InformasiEvent
                     nama={eventDetail.nama}
@@ -133,7 +151,7 @@ const DetailtEventScreen = ({ route }) => {
                                 (
                                     item.jenis == 'image' ?
                                         <Image source={{ uri: `${BASE_URL}/storage/files/event-media/${item.file}` }}
-                                            alt="Alternate Text" size="xl" borderRadius={5} mr={2} key={index} />
+                                            alt="Alternate Text" width={windowWidth * (30 / 100)} height={windowWidth * (30 / 100)} borderRadius={5} mr={2} key={index} />
 
                                         : item.jenis == 'youtube' ?
                                             <TouchableOpacity onPress={() => { Linking.openURL(`https://youtu.be/${item.file}`) }}>
@@ -166,6 +184,8 @@ const DetailtEventScreen = ({ route }) => {
                     <RenderHTML
                         contentWidth={width}
                         source={description}
+                        tagsStyles={tagsStyles}
+
                     />
                     <Box mt={5}>
                         {isLoading ? <Spinner /> :
@@ -199,7 +219,7 @@ const DetailtEventScreen = ({ route }) => {
                     </Box>
                     : eventDetail.status == 'canceled' ? <Box bgColor="#999" borderRadius={50} py={3} mx={5} mt={10}>
                         <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Tutup</Text>
-                    </Box> : <TouchableOpacity onPress={() => daftarEvent()}>
+                    </Box> : isLoadingDaftarEvent ? <Spinner /> : <TouchableOpacity onPress={() => daftarEvent()}>
                         <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={10}>
                             <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar Sekarang</Text>
                         </Box>
@@ -210,6 +230,7 @@ const DetailtEventScreen = ({ route }) => {
                     <RenderHTML
                         contentWidth={width}
                         source={ketentuan}
+                        tagsStyles={tagsStyles}
                     />
                 </Box>
             </>
