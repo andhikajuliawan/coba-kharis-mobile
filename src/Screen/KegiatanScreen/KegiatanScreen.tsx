@@ -240,7 +240,7 @@ const EventListScreen = ({ route }) => {
       </Box>
       {/* Onsite Event */}
       <Box>
-        <HStack p={5} alignItems="center" justifyContent="space-between">
+        <HStack mt={5} px={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
             Onsite Event
           </Text>
@@ -296,14 +296,17 @@ const EventListScreen = ({ route }) => {
               let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
               let displayDate = `${formatDateStart} - ${formatDateEnd}`
 
+              const panjangText = onsite.nama.length > 30 ? onsite.nama.substring(0, 30) + '...' : onsite.nama;
+
+
               return <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(onsite.id)}>
                   {image}
                   <Text color="#A6ADB5" mt={2} fontSize={12}>
                     {displayDate}
                   </Text>
-                  <Text fontWeight="bold" fontSize={16}>
-                    {onsite.nama}
+                  <Text fontWeight="bold" fontSize={16} lineHeight={20}>
+                    {panjangText}
                   </Text>
                 </TouchableOpacity>
               </Box>
@@ -320,7 +323,7 @@ const EventListScreen = ({ route }) => {
 
       {/* Online event */}
       <Box>
-        <HStack p={5} alignItems="center" justifyContent="space-between">
+        <HStack mt={5} px={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
             Online Event
           </Text>
@@ -376,14 +379,17 @@ const EventListScreen = ({ route }) => {
               let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
               let displayDate = `${formatDateStart} - ${formatDateEnd}`
 
+              const panjangText = online.nama.length > 30 ? online.nama.substring(0, 30) + '...' : online.nama;
+
+
               return <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(online.id)}>
                   {image}
                   <Text color="#A6ADB5" mt={2} fontSize={12}>
                     {displayDate}
                   </Text>
-                  <Text fontWeight="bold" fontSize={16}>
-                    {online.nama}
+                  <Text fontWeight="bold" fontSize={16} lineHeight={20}>
+                    {panjangText}
                   </Text>
                 </TouchableOpacity>
               </Box>

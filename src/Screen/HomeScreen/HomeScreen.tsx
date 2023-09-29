@@ -107,11 +107,11 @@ const HomeScreen = () => {
 
   // Menu statis yang memang disediakan dalam app
   const [menuStatis] = useState([
-    {
-      id: jmlMenuDinamis + 2,
-      logo: require('../../../assets/icons/Home/Menu/Menu_8.png'),
-      title: 'Family Gathering',
-    },
+    // {
+    //   id: jmlMenuDinamis + 2,
+    //   logo: require('../../../assets/icons/Home/Menu/Menu_8.png'),
+    //   title: 'Family Gathering',
+    // },
     {
       id: jmlMenuDinamis + 3,
       logo: require('../../../assets/icons/Home/Menu/Menu_9.png'),

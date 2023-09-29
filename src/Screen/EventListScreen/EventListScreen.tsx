@@ -197,6 +197,7 @@ const EventListScreen = ({ route }) => {
             let formatDateStart = format(dateStart, "dd");
             let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
             let displayDate = `${formatDateStart} - ${formatDateEnd}`
+
             return (
               <Box width="45%" m={2} key={index}>
                 <TouchableOpacity
@@ -218,7 +219,7 @@ const EventListScreen = ({ route }) => {
       </Box>
       {/* Upcoming Event */}
       <Box>
-        <HStack p={5} alignItems="center" justifyContent="space-between">
+        <HStack mt={5} px={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
             Upcoming Event
           </Text>
@@ -331,15 +332,18 @@ const EventListScreen = ({ route }) => {
               let formatDateEnd = format(dateEnd, 'dd MMMM yyyy');
               let displayDate = `${formatDateStart} - ${formatDateEnd}`;
 
+              const panjangText = open.nama.length > 30 ? open.nama.substring(0, 30) + '...' : open.nama;
+
+
               return (
                 <Box width="45%" m={2} key={index}>
                   <TouchableOpacity onPress={() => onPressDetailEvent(open.id)}>
                     {image}
-                    <Text color="#A6ADB5" my={1} fontSize={12}>
+                    <Text color="#A6ADB5" mt={2} fontSize={12}>
                       {displayDate}
                     </Text>
-                    <Text fontWeight="bold" fontSize={16}>
-                      {open.nama}
+                    <Text fontWeight="bold" fontSize={16} lineHeight={20}>
+                      {panjangText}
                     </Text>
                   </TouchableOpacity>
                 </Box>
@@ -357,7 +361,7 @@ const EventListScreen = ({ route }) => {
 
       {/* Last event */}
       < Box >
-        <HStack p={5} alignItems="center" justifyContent="space-between">
+        <HStack mt={5} px={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
             Last Event
           </Text>
@@ -419,17 +423,18 @@ const EventListScreen = ({ route }) => {
               let formatDateStart = format(dateStart, 'dd');
               let formatDateEnd = format(dateEnd, 'dd MMMM yyyy');
               let displayDate = `${formatDateStart} - ${formatDateEnd}`;
+              const panjangText = close.nama.length > 30 ? close.nama.substring(0, 30) + '...' : close.nama;
 
               return (
                 <Box width="45%" m={2} key={index}>
                   <TouchableOpacity
                     onPress={() => onPressDetailEvent(close.id)}>
                     {image}
-                    <Text color="#A6ADB5" my={2}>
+                    <Text color="#A6ADB5" mt={2} fontSize={12}>
                       {displayDate}
                     </Text>
-                    <Text fontWeight="bold" fontSize={16}>
-                      {close.nama}
+                    <Text fontWeight="bold" fontSize={16} lineHeight={20}>
+                      {panjangText}
                     </Text>
                   </TouchableOpacity>
                 </Box>

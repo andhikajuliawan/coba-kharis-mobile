@@ -32,7 +32,7 @@ const InformasiEvent = ({ nama, dateStart, dateEnd, lokasi, peserta, harga }) =>
             <LinearGradient colors={['#00000000', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff']}>
                 {/* <ImageBackground source={require('../../../../assets/bg/gradientTitle.png')}> */}
                 <Box px={5}>
-                    <Text fontSize={24} fontWeight="bold" mb={1} mt={5}>{nama}</Text>
+                    <Text fontSize={20} fontWeight="bold" mb={5} mt={10} lineHeight={25}>{nama}</Text>
                     <HStack alignItems="center" >
                         <Dates width={scale(24)} height={scale(24)} />
                         <Text ml={1} fontSize={16} mb={1} >{displayDate}</Text>

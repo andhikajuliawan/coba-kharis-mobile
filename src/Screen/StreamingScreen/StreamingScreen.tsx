@@ -141,12 +141,12 @@ const ThumbnailVideo = ({ urlVideo, title, pembicara, linkUrl }: ThumbnailVideoP
 
 
   return (
-    <View style={{ flexDirection: 'column', width: scale(156), marginBottom: scale(15) }}>
+    <View style={{ flexDirection: 'column', width: scale(156), marginBottom: scale(5) }}>
       <TouchableOpacity onPress={() => { Linking.openURL(`https://youtu.be/${linkUrl}`) }}>
         <ImageBackground source={{ uri: urlVideo }} style={{ width: scale(156), aspectRatio: 16 / 9 }} imageStyle={{ borderRadius: 10 }} resizeMode='cover' >
         </ImageBackground>
-        <LimitText text={title} limit={40} custom={styles.textVideoTitle} />
-        <LimitText text={pembicara} limit={29} custom={styles.textVideoPembicara} />
+        <LimitText text={title} limit={50} custom={styles.textVideoTitle} />
+        <LimitText text={pembicara} limit={15} custom={styles.textVideoPembicara} />
       </TouchableOpacity>
 
     </View>
@@ -990,7 +990,7 @@ const styles = ScaledSheet.create({
     color: '#495057',
     marginVertical: scale(3),
     fontWeight: 'bold',
-    width: scale(180),
+    width: "100%",
   },
 
   textVideoPembicara: {
