@@ -25,7 +25,7 @@ import {useNavigation} from '@react-navigation/native';
 const SignInScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const {isLoading, login} = useContext(AuthContext);
+  const {isLoading, isLoadingGoogle, login, signIn, signOut} = useContext(AuthContext);
 
   const navigation = useNavigation();
 
@@ -35,7 +35,7 @@ const SignInScreen = () => {
  
 
   const onSubmitPressed = () => {
-    navigation.navigate('Home');
+    navigation.navigate('SignUp');
   };
 
 //   const onResetPasswordPressed = () => {
@@ -48,11 +48,12 @@ const SignInScreen = () => {
 
   return (
     <ScrollView>
-        <Box>
+        <Box marginY={10}>
             {/* Logo */}
             <Center>
                 <VStack alignItems="center">
                     <Image
+                        source={require('../../../assets/logo/logoKharis.png')}
                         alt="Alternate Text"
                         size="md"
                         marginY={5}
@@ -134,7 +135,7 @@ const SignInScreen = () => {
                         Don't have a account ? 
                     </Text>
                     <Text
-                        // onPress={onPressText}
+                        onPress={() => { onSubmitPressed(); }}
                         color="#3EADE2"
                         fontFamily="Poppins-Bold"
                         fontSize={14}
@@ -165,7 +166,7 @@ const SignInScreen = () => {
             {/* Sosial Media Button */}
             <Center marginBottom={2}>
                 <Button
-                    onPress={onGooglePressed}
+                    onPress={() => { signIn(); }}
                     variant="outline"
                     width="90%"
                     backgroundColor="#FFF">
@@ -187,7 +188,7 @@ const SignInScreen = () => {
                             color="#9098B1"
                             fontSize={14}
                             fontFamily="Poppins-Bold">
-                            Login with Google
+                            {isLoadingGoogle ? <Spinner color="#9098B1" /> : "Login with Google"}
                             </Text>
                         </Center>
                         </Box>
