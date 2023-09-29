@@ -4,7 +4,7 @@ import { Alert, Dimensions, ImageBackground, Linking, TouchableOpacity, useWindo
 import { ScaledSheet } from "react-native-size-matters"
 import { scale } from 'react-native-size-matters';
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BASE_URL } from "../../config";
 import RenderHTML from "react-native-render-html";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
@@ -16,6 +16,7 @@ import Person from '../../../assets/icons/EventDetail/person.svg'
 import Money from '../../../assets/icons/EventDetail/giftcard.svg'
 import { format } from "date-fns";
 import InformasiEvent from "../../Component/DetailEvent/InformasiEvent";
+import { AuthContext } from "../../Context/AuthContext";
 
 
 
@@ -25,11 +26,15 @@ const DetailtEventScreen = ({ route }) => {
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [date, setDate] = useState('');
+    const { userInfo } = useContext(AuthContext);
+
 
     const getDetailEvent = () => {
         axios
             .get(
-                `${BASE_URL}/api/event-detail/${route.params.id}`,
+                `${BASE_URL}/api/event-detail/${route.params.id}`, {
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+            }
             )
             .then(response => response.data)
             .then(data => {
@@ -39,13 +44,33 @@ const DetailtEventScreen = ({ route }) => {
             .then(() => {
                 setLatitude(parseFloat(eventDetail.lat));
                 setLongitude(parseFloat(eventDetail.lng));
-
             })
             .catch(err => {
                 console.log(err);
             })
             .finally(() => {
                 setIsLoading(false)
+            })
+    };
+
+    const daftarEvent = () => {
+        axios
+            .post(
+                `${BASE_URL}/api/daftar-event`, {
+                event_id: eventDetail.id,
+                user_id: userInfo.user.id,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${userInfo.token}`,
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            },)
+            .then(response => console.log(response.data))
+            .catch(err => {
+                console.log(err);
+            })
+            .finally(() => {
             })
     };
 
@@ -143,33 +168,43 @@ const DetailtEventScreen = ({ route }) => {
                         source={description}
                     />
                     <Box mt={5}>
-                        {isLoading ? <Spinner /> : <MapView
-                            provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-                            style={{ width: '100%', height: 250, borderRadius: 50 }}
-                            initialRegion={{
-                                latitude: parseFloat(eventDetail.lat),
-                                longitude: parseFloat(eventDetail.lng),
-                                latitudeDelta: 0.009,
-                                longitudeDelta: 0.009,
-                            }}
-                        >
-                            <Marker
-                                coordinate={{
-                                    latitude: parseFloat(eventDetail.lat),
-                                    longitude: parseFloat(eventDetail.lng),
-                                }}
-                                title="lokasi acara"
-                            />
-                        </MapView>}
+                        {isLoading ? <Spinner /> :
+                            <TouchableOpacity onPress={() => { Linking.openURL(`geo:0.05,0.05?q=${eventDetail.lat},${eventDetail.lng}`) }}>
+                                <MapView
+                                    provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+                                    style={{ width: '100%', height: 250, borderRadius: 50 }}
+                                    initialRegion={{
+                                        latitude: parseFloat(eventDetail.lat),
+                                        longitude: parseFloat(eventDetail.lng),
+                                        latitudeDelta: 0.009,
+                                        longitudeDelta: 0.009,
+                                    }}
+                                >
+                                    <Marker
+                                        coordinate={{
+                                            latitude: parseFloat(eventDetail.lat),
+                                            longitude: parseFloat(eventDetail.lng),
+                                        }}
+                                        title="lokasi acara"
+                                    />
+                                </MapView></TouchableOpacity>
+                        }
 
                     </Box>
 
                 </Box>
-                <TouchableOpacity>
-                    <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={10}>
-                        <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar Sekarang</Text>
+                {eventDetail.status == 'finish' ?
+                    <Box bgColor="#999" borderRadius={50} py={3} mx={5} mt={10}>
+                        <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Tutup</Text>
                     </Box>
-                </TouchableOpacity>
+                    : eventDetail.status == 'canceled' ? <Box bgColor="#999" borderRadius={50} py={3} mx={5} mt={10}>
+                        <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Tutup</Text>
+                    </Box> : <TouchableOpacity onPress={() => daftarEvent()}>
+                        <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={10}>
+                            <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar Sekarang</Text>
+                        </Box>
+                    </TouchableOpacity>}
+
                 <Box m={5}>
                     <Text fontWeight="bold" color="#555F65" fontSize={16} >Ketentuan Peserta</Text>
                     <RenderHTML

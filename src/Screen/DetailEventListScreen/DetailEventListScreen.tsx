@@ -2,21 +2,26 @@ import { Box, Flex, Image, ScrollView, Spinner, Text, Center } from "native-base
 import Header from "../../Component/DetailEventList/Header";
 import axios from "axios";
 import { BASE_URL } from "../../config";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Dimensions, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { format } from "date-fns";
+import { AuthContext } from "../../Context/AuthContext";
 
 const DetailtEventListScreen = ({ route }) => {
 
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(true);
     const [listEvent, setListEvent] = useState([]);
+    const { userInfo } = useContext(AuthContext);
+
 
     const getListEvent = () => {
         axios
             .get(
-                `${BASE_URL}/api/event/kategori/${route.params.id}/status/${route.params.status}`,
+                `${BASE_URL}/api/event/kategori/${route.params.id}/status/${route.params.status}`, {
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+            }
             )
             .then(response => response.data)
             .then(data => {

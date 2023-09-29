@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import type { PropsWithChildren } from 'react';
 
 import {
@@ -33,6 +33,8 @@ import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import { Box, Center, Spinner } from 'native-base';
 
+import { AuthContext } from '../../Context/AuthContext';
+
 type SectionProps = PropsWithChildren<{
   text: string;
   limit: number;
@@ -55,7 +57,7 @@ const HomeScreen = () => {
 
 
   // State untuk informasi user
-  const [userInfo] = useState({
+  const [usersInfo] = useState({
     name: 'Pdt. Nyoman Widiantara',
   });
   // Menu dinamis diambil dari banyaknya event
@@ -98,6 +100,7 @@ const HomeScreen = () => {
   //   }
   // ]);
 
+  const { logout, userInfo } = useContext(AuthContext);
 
   const jmlMenuDinamis = menu.length;
   const [jmlMenuStatis, setJmlMenuStatis] = useState<any | null>(null);
@@ -228,7 +231,10 @@ const HomeScreen = () => {
   };
 
   const getCategories = () => {
-    axios.get(`${BASE_URL}/api/event-categories`)
+    console.log(userInfo)
+    axios.get(`${BASE_URL}/api/event-categories`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => {
         let menu = response.data.categories;
         setMenu(menu)
@@ -238,7 +244,9 @@ const HomeScreen = () => {
       })
   };
   const getContentYoutube = () => {
-    axios.get(`${BASE_URL}/api/event/content/youtube/take/1`)
+    axios.get(`${BASE_URL}/api/event/content/youtube/take/1`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => setContentYoutube(data.data)))
       .catch((err) => {
@@ -247,7 +255,9 @@ const HomeScreen = () => {
       .finally(() => setIsLoadingYoutube(false))
   };
   const getRecommendEvent = () => {
-    axios.get(`${BASE_URL}/api/event`)
+    axios.get(`${BASE_URL}/api/event`, {
+      headers: { Authorization: `Bearer ${userInfo.token}` },
+    })
       .then((response) => response.data)
       .then((data => setRecommendEvent(data.data)))
       .catch((err) => {
@@ -296,7 +306,7 @@ const HomeScreen = () => {
         <Header />
         <View style={styles.headerHome}>
           <Text style={styles.text_header_1}>Welcome Blessed Family of</Text>
-          <Text style={styles.text_header_2}>{userInfo.name}</Text>
+          <Text style={styles.text_header_2}>{usersInfo.name}</Text>
         </View>
       </ImageBackground>
       <View style={styles.content}>
@@ -850,12 +860,13 @@ const HomeScreen = () => {
         }}>
         <Text style={styles.textEvent}>Recommended Event</Text>
         <TouchableOpacity
+          onPress={() => { logout(); }}
           style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
           }}>
-          <Text style={styles.textEventButton}>View all</Text>
+          <Text style={styles.textEventButton}>Log Out</Text>
           <ArrowVButton height={scale(15)} width={scale(7)} />
         </TouchableOpacity>
       </View>

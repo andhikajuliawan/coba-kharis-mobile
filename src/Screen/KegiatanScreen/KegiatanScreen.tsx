@@ -17,10 +17,12 @@ import SearchInput from '../../../assets/icons/EvenList/Header/Search-Input.svg'
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../../Context/AuthContext';
+import { format } from 'date-fns';
 
 const EventListScreen = ({ route }) => {
   // Navigation init
@@ -34,13 +36,16 @@ const EventListScreen = ({ route }) => {
   const [isLoadingOnsite, setIsLoadingOnsite] = useState(true);
   const [isLoadingOnline, setIsLoadingOnline] = useState(true);
   const [isLoadingHybrid, setIsLoadingHybrid] = useState(true);
+  const { userInfo } = useContext(AuthContext);
 
 
 
   const getListEvent = () => {
     axios
       .get(
-        `${BASE_URL}/api/event`,
+        `${BASE_URL}/api/event`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -55,7 +60,9 @@ const EventListScreen = ({ route }) => {
   const getListEventOnsite = () => {
     axios
       .get(
-        `${BASE_URL}/api/event/online/onsite`,
+        `${BASE_URL}/api/event/online/onsite`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -73,7 +80,9 @@ const EventListScreen = ({ route }) => {
   const getListEventOnline = () => {
     axios
       .get(
-        `${BASE_URL}/api/event/online/online`,
+        `${BASE_URL}/api/event/online/online`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -91,7 +100,9 @@ const EventListScreen = ({ route }) => {
   const getListEventHybrid = () => {
     axios
       .get(
-        `${BASE_URL}/event/online/hybrid`,
+        `${BASE_URL}/event/online/hybrid`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -177,19 +188,51 @@ const EventListScreen = ({ route }) => {
         InputRightElement={<SearchInput width={scale(25)} height={scale(25)} />}
       />
       <Box mx={5}>
-        {setEventByPencarian != 0 ? eventByPencarian.map((pencarian, index) => (
-          <Box width="45%" m={2} key={index}>
-            <TouchableOpacity onPress={() => onPressDetailEvent(pencarian.id)}>
-
-              <Text color="#A6ADB5" my={2}>
-                {pencarian.tanggal_mulai}
-              </Text>
-              <Text fontWeight="bold" fontSize={16}>
-                {pencarian.nama}
-              </Text>
-            </TouchableOpacity>
-          </Box>
-        )) : <></>}
+        {setEventByPencarian != 0 ? eventByPencarian.map((pencarian, index) => {
+          if (pencarian.event_media[0].jenis == 'image') {
+            var image = (
+              <Image
+                source={{
+                  uri: `${BASE_URL}/storage/files/event-media/${pencarian.event_media[0].file}`,
+                }}
+                width="100%"
+                alt="image"
+                height={windowHeight * (18 / 100)}
+                borderRadius={10}
+                resizeMode="contain"
+              />
+            );
+          } else {
+            var image = (
+              <Image
+                source={{ uri: `${pencarian.event_media[0].thumbnail}` }}
+                width="100%"
+                alt="image"
+                height={windowHeight * (15 / 100)}
+                borderRadius={10}
+                resizeMode="contain"
+              />
+            );
+          }
+          let dateStart = new Date(pencarian.tanggal_mulai);
+          let dateEnd = new Date(pencarian.tanggal_selesai);
+          let formatDateStart = format(dateStart, "dd");
+          let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+          let displayDate = `${formatDateStart} - ${formatDateEnd}`
+          return (
+            <Box width="45%" m={2} key={index}>
+              <TouchableOpacity onPress={() => onPressDetailEvent(pencarian.id)}>
+                {image}
+                <Text color="#A6ADB5" my={2}>
+                  {displayDate}
+                </Text>
+                <Text fontWeight="bold" fontSize={16}>
+                  {pencarian.nama}
+                </Text>
+              </TouchableOpacity>
+            </Box>
+          )
+        }) : <></>}
       </Box>
       {/* Onsite Event */}
       <Box>
@@ -220,7 +263,7 @@ const EventListScreen = ({ route }) => {
                     source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
                     width="100%"
                     alt='image'
-                    height={windowHeight * (15 / 100)}
+                    height={windowHeight * (18 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
@@ -242,11 +285,18 @@ const EventListScreen = ({ route }) => {
                 >
                   <Center>no Image</Center></Box>
               }
+
+              let dateStart = new Date(onsite.tanggal_mulai);
+              let dateEnd = new Date(onsite.tanggal_selesai);
+              let formatDateStart = format(dateStart, "dd");
+              let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+              let displayDate = `${formatDateStart} - ${formatDateEnd}`
+
               return <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(onsite.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {onsite.tanggal_mulai}
+                    {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
                     {onsite.nama}
@@ -293,7 +343,7 @@ const EventListScreen = ({ route }) => {
                     source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
                     width="100%"
                     alt='image'
-                    height={windowHeight * (15 / 100)}
+                    height={windowHeight * (18 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
@@ -316,11 +366,17 @@ const EventListScreen = ({ route }) => {
                   <Center>no Image</Center></Box>
               }
 
+              let dateStart = new Date(online.tanggal_mulai);
+              let dateEnd = new Date(online.tanggal_selesai);
+              let formatDateStart = format(dateStart, "dd");
+              let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+              let displayDate = `${formatDateStart} - ${formatDateEnd}`
+
               return <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(online.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {online.tanggal_mulai}
+                    {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
                     {online.nama}

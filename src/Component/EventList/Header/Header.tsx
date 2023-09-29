@@ -8,27 +8,36 @@
 import React from 'react';
 
 import {
-    View, Text
+    View, Text, Touchable, TouchableOpacity
 } from 'react-native';
 
 // SVG
 import Scan from '../../../../assets/icons/EvenList/Header/Scan.svg';
+import Back from '../../../../assets/icons/Header/BackBlue.svg'
 import Search from '../../../../assets/icons/EvenList/Header/Search.svg';
 import Notification from '../../../../assets/icons/EvenList/Header/Notification.svg';
 import Setting from '../../../../assets/icons/EvenList/Header/Setting.svg';
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
+import { useNavigation } from '@react-navigation/native';
 
 
 
-const Header = () => {
 
+const Header = (back: any) => {
+    const navigation = useNavigation();
 
     return (
         <View style={styles.container}>
             <View style={styles.space1}>
-                <Scan width={scale(28)} height={scale(28)} />
+                {back ?
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <Back width={scale(28)} height={scale(28)} />
+                    </TouchableOpacity>
+                    :
+                    <Scan width={scale(28)} height={scale(28)} />
+                }
                 <Text style={styles.title}>Kegiatan</Text>
             </View>
 

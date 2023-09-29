@@ -17,11 +17,12 @@ import SearchInput from '../../../assets/icons/EvenList/Header/Search-Input.svg'
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../../config';
 import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
+import { AuthContext } from '../../Context/AuthContext';
 
 const EventListScreen = ({ route }) => {
   // Navigation init
@@ -34,10 +35,14 @@ const EventListScreen = ({ route }) => {
   const [eventByPencarian, setEventByPencarian] = useState([]);
   const [isLoadingOpen, setIsLoadingOpen] = useState(true);
   const [isLoadingClose, setIsLoadingClose] = useState(true);
+  const { userInfo } = useContext(AuthContext);
+
 
   const getListEvent = () => {
     axios
-      .get(`${BASE_URL}/api/event/kategori/${route.params.kategori.id}`)
+      .get(`${BASE_URL}/api/event/kategori/${route.params.kategori.id}`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      })
       .then(response => response.data)
       .then(data => {
         setListEvent(data.data);
@@ -51,7 +56,9 @@ const EventListScreen = ({ route }) => {
   const getListEventOpen = () => {
     axios
       .get(
-        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/open`,
+        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/open`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -73,7 +80,9 @@ const EventListScreen = ({ route }) => {
   const getListEventClose = () => {
     axios
       .get(
-        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/close`,
+        `${BASE_URL}/api/event/kategori/${route.params.kategori.id}/status/close`, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      }
       )
       .then(response => response.data)
       .then(data => {
@@ -143,7 +152,7 @@ const EventListScreen = ({ route }) => {
 
   return (
     <ScrollView bgColor="#fff">
-      <Header />
+      <Header back={true} />
 
       <Input
         placeholder={'Cari ' + route.params.kategori.nama + ' ...'}
@@ -158,11 +167,11 @@ const EventListScreen = ({ route }) => {
       <Box mx={5}>
         {setEventByPencarian != 0 ? (
           eventByPencarian.map((pencarian, index) => {
-            if (pencarian.event_media.jenis == 'image') {
+            if (pencarian.event_media[0].jenis == 'image') {
               var image = (
                 <Image
                   source={{
-                    uri: `${BASE_URL}/storage/files/event-media/${pencarian.event_media.file}`,
+                    uri: `${BASE_URL}/storage/files/event-media/${pencarian.event_media[0].file}`,
                   }}
                   width="100%"
                   alt="image"
@@ -174,7 +183,7 @@ const EventListScreen = ({ route }) => {
             } else {
               var image = (
                 <Image
-                  source={{ uri: `${pencarian.event_media.thumbnail}` }}
+                  source={{ uri: `${pencarian.event_media[0].thumbnail}` }}
                   width="100%"
                   alt="image"
                   height={windowHeight * (15 / 100)}
@@ -183,13 +192,18 @@ const EventListScreen = ({ route }) => {
                 />
               );
             }
+            let dateStart = new Date(pencarian.tanggal_mulai);
+            let dateEnd = new Date(pencarian.tanggal_selesai);
+            let formatDateStart = format(dateStart, "dd");
+            let formatDateEnd = format(dateEnd, "dd MMMM yyyy");
+            let displayDate = `${formatDateStart} - ${formatDateEnd}`
             return (
               <Box width="45%" m={2} key={index}>
                 <TouchableOpacity
                   onPress={() => onPressDetailEvent(pencarian.id)}>
                   {image}
                   <Text color="#A6ADB5" my={2}>
-                    {pencarian.tanggal_mulai}
+                    {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
                     {pencarian.nama}
@@ -229,7 +243,7 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 100)}
+                      height={windowHeight * (20 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -284,7 +298,7 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 100)}
+                      height={windowHeight * (18 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
@@ -373,7 +387,7 @@ const EventListScreen = ({ route }) => {
                       }}
                       width="100%"
                       alt="image"
-                      height={windowHeight * (15 / 10)}
+                      height={windowHeight * (18 / 100)}
                       borderRadius={10}
                       resizeMode="contain"
                     />
