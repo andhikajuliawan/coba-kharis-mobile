@@ -6,6 +6,8 @@ import React, {createContext, useEffect, useState} from 'react';
 import {BASE_URL} from '../config';
 import { CSSAbsoluteLengthUnitsMultiplicators } from 'react-native-render-html';
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { getFormatedDate } from "react-native-modern-datepicker";
+import {password} from 'secure-random-password';
 
 type AuthProps = PropsWithChildren<{
   children: any;
@@ -116,7 +118,20 @@ export const AuthProvider = ({children}: AuthProps) => {
       setUserGoogleInfo(usrInfo);
       console.log(usrInfo);
 
+      const today = new Date();
+      const startDate = getFormatedDate(
+        today.setDate(today.getDate()),
+        "YYYY/MM/DD"
+      );
+
       let email = usrInfo.user.email;
+      let name = usrInfo.user.name;
+
+      let jenis_kelamin = "test";
+      let pekerjaan = "test";
+      let whatsapp = 0;
+      let alamat = "test";
+      let passKey = email.split("@");
 
       // Check user email and get token
       setIsLoadingGoogle(true);
@@ -134,7 +149,7 @@ export const AuthProvider = ({children}: AuthProps) => {
         })
         .catch(e => {
           console.log(`checkGoogle error ${e}`);
-          signOut();
+          register(passKey[0], name, email, alamat, whatsapp, pekerjaan, jenis_kelamin, startDate, passKey[0])
           setIsLoadingGoogle(false);
         });
 
