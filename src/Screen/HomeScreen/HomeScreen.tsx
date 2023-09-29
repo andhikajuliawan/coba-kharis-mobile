@@ -487,35 +487,36 @@ const HomeScreen = () => {
             </>
           )}
         </View>
+        <Box mt={-5}>
+          {/* Tombol Hide and Show */}
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              paddingVertical: scale(1),
+            }}
+            onPress={pressShowMenu}>
+            {showMenu ? (
+              <Image
+                source={require('../../../assets/icons/Home/Menu/hide.png')}
+                resizeMode="contain"
+                style={{
+                  maxHeight: scale(16),
+                  maxWidth: scale(48),
+                }}
+              />
+            ) : (
+              <Image
+                source={require('../../../assets/icons/Home/Menu/show.png')}
+                resizeMode="contain"
+                style={{
+                  maxHeight: scale(16),
+                  maxWidth: scale(48),
+                }}
+              />
+            )}
+          </TouchableOpacity></Box>
 
-        {/* Tombol Hide and Show */}
-        <TouchableOpacity
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingVertical: scale(1),
-          }}
-          onPress={pressShowMenu}>
-          {showMenu ? (
-            <Image
-              source={require('../../../assets/icons/Home/Menu/hide.png')}
-              resizeMode="contain"
-              style={{
-                maxHeight: scale(16),
-                maxWidth: scale(48),
-              }}
-            />
-          ) : (
-            <Image
-              source={require('../../../assets/icons/Home/Menu/show.png')}
-              resizeMode="contain"
-              style={{
-                maxHeight: scale(16),
-                maxWidth: scale(48),
-              }}
-            />
-          )}
-        </TouchableOpacity>
       </View>
 
       {/* Thumbnail Youtube */}

@@ -216,7 +216,7 @@ const EventListScreen = ({ route }) => {
           <></>
         )}
       </Box>
-      {/* Onsite Event */}
+      {/* Upcoming Event */}
       <Box>
         <HStack p={5} alignItems="center" justifyContent="space-between">
           <Text fontSize={18} fontWeight="bold">
@@ -266,7 +266,7 @@ const EventListScreen = ({ route }) => {
                 {/* <Text color="#A6ADB5" my={2}> */}
                 {/* {bannerOpen.tanggal_mulai} */}
                 {/* </Text> */}
-                <Text fontWeight="bold" fontSize={16}>
+                <Text fontWeight="bold" fontSize={16} my={1}>
                   {bannerOpen.nama}
                 </Text>
               </TouchableOpacity>
@@ -335,7 +335,7 @@ const EventListScreen = ({ route }) => {
                 <Box width="45%" m={2} key={index}>
                   <TouchableOpacity onPress={() => onPressDetailEvent(open.id)}>
                     {image}
-                    <Text color="#A6ADB5" my={2} fontSize={12}>
+                    <Text color="#A6ADB5" my={1} fontSize={12}>
                       {displayDate}
                     </Text>
                     <Text fontWeight="bold" fontSize={16}>

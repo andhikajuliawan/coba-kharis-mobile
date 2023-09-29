@@ -178,7 +178,7 @@ const EventListScreen = ({ route }) => {
   }
 
   return (
-    <ScrollView bgColor="#fff" >
+    <ScrollView bgColor="#fff" mb={60}>
       <Header />
 
       <Input
@@ -227,7 +227,7 @@ const EventListScreen = ({ route }) => {
             <Box width="45%" m={2} key={index}>
               <TouchableOpacity onPress={() => onPressDetailEvent(pencarian.id)}>
                 {image}
-                <Text color="#A6ADB5" my={2}>
+                <Text color="#A6ADB5" my={1} fontSize={12}>
                   {displayDate}
                 </Text>
                 <Text fontWeight="bold" fontSize={16}>
@@ -299,7 +299,7 @@ const EventListScreen = ({ route }) => {
               return <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(onsite.id)}>
                   {image}
-                  <Text color="#A6ADB5" my={2}>
+                  <Text color="#A6ADB5" mt={2} fontSize={12}>
                     {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>
@@ -379,7 +379,7 @@ const EventListScreen = ({ route }) => {
               return <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(online.id)}>
                   {image}
-                  <Text color="#A6ADB5" my={2}>
+                  <Text color="#A6ADB5" mt={2} fontSize={12}>
                     {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>

@@ -952,7 +952,7 @@ const styles = ScaledSheet.create({
 
   textJudulStreaming: {
     fontFamily: 'SF-Pro-Text-Bold',
-    fontSize: scale(12),
+    fontSize: scale(14),
     color: '#495057',
     marginBottom: scale(2),
     fontWeight: 'bold',
