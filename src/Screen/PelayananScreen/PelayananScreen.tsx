@@ -5,17 +5,18 @@
  * @format
  */
 
+import { Box, Center, Text } from 'native-base';
 import React from 'react';
-import type {PropsWithChildren} from 'react';
+import type { PropsWithChildren } from 'react';
 
 import {
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    useColorScheme,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+
+  useColorScheme,
+  View,
 } from 'react-native';
 
 import {
@@ -34,9 +35,11 @@ const PelayananScreen = () => {
 
 
   return (
-    <View>
-        <Text>PelayananScreen</Text>
-    </View>
+    <Box flex={1} bgColor="#fff" justifyContent="center">
+      <Center >
+        Halaman Pelayanan Belum Tersedia
+      </Center>
+    </Box>
   );
 };
 

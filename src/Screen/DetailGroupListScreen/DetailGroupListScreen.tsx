@@ -91,7 +91,7 @@ const DetailGroupListScreen = ({ route }) => {
                     }}
                     width="100%"
                     alt="image"
-                    height={windowHeight * (18 / 100)}
+                    height={windowHeight * (20 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
@@ -157,7 +157,7 @@ const DetailGroupListScreen = ({ route }) => {
                     }}
                     width="100%"
                     alt="image"
-                    height={windowHeight * (18 / 100)}
+                    height={windowHeight * (20 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
@@ -168,7 +168,7 @@ const DetailGroupListScreen = ({ route }) => {
                     source={{ uri: `${event.event_media[0].thumbnail}` }}
                     width="100%"
                     alt="image"
-                    height={windowHeight * (15 / 100)}
+                    height={windowHeight * (20 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
@@ -178,7 +178,7 @@ const DetailGroupListScreen = ({ route }) => {
               var image = (
                 <Box
                   width="100%"
-                  height={windowHeight * (15 / 100)}
+                  height={windowHeight * (20 / 100)}
                   borderRadius={10}>
                   <Center>no Image</Center>
                 </Box>
@@ -193,7 +193,7 @@ const DetailGroupListScreen = ({ route }) => {
               <Box width="45%" m={2} key={index}>
                 <TouchableOpacity onPress={() => onPressDetailEvent(event.id)}>
                   {image}
-                  <Text color="#A6ADB5" my={2}>
+                  <Text color="#A6ADB5" my={2} fontSize={12}>
                     {displayDate}
                   </Text>
                   <Text fontWeight="bold" fontSize={16}>

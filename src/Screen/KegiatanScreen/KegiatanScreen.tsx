@@ -66,11 +66,13 @@ const EventListScreen = ({ route }) => {
       )
       .then(response => response.data)
       .then(data => {
+        let getOnsite = []
         for (let index = 0; index < 4; index++) {
           if (data.data[index]) {
-            let onsite = eventByOnsite.push(data.data[index]);
+            let onsite = getOnsite.push(data.data[index]);
           }
         }
+        setEventByOnsite(getOnsite)
       })
       .catch(err => {
         console.log(err);
@@ -86,11 +88,13 @@ const EventListScreen = ({ route }) => {
       )
       .then(response => response.data)
       .then(data => {
+        let getOnline = []
         for (let index = 0; index < 4; index++) {
           if (data.data[index]) {
-            let online = eventByOnline.push(data.data[index]);
+            let online = getOnline.push(data.data[index]);
           }
         }
+        setEventByOnline(getOnline)
       })
       .catch(err => {
         console.log(err);
@@ -197,7 +201,7 @@ const EventListScreen = ({ route }) => {
                 }}
                 width="100%"
                 alt="image"
-                height={windowHeight * (18 / 100)}
+                height={windowHeight * (20 / 100)}
                 borderRadius={10}
                 resizeMode="contain"
               />
@@ -263,7 +267,7 @@ const EventListScreen = ({ route }) => {
                     source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
                     width="100%"
                     alt='image'
-                    height={windowHeight * (18 / 100)}
+                    height={windowHeight * (20 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />
@@ -343,7 +347,7 @@ const EventListScreen = ({ route }) => {
                     source={{ uri: `${BASE_URL}/storage/files/event-media/${getImage[0].file}` }}
                     width="100%"
                     alt='image'
-                    height={windowHeight * (18 / 100)}
+                    height={windowHeight * (20 / 100)}
                     borderRadius={10}
                     resizeMode="contain"
                   />

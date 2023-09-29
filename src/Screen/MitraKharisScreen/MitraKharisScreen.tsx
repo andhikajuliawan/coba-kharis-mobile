@@ -6,16 +6,16 @@
  */
 
 import React from 'react';
-import type {PropsWithChildren} from 'react';
+import { Box, Center, Text } from 'native-base';
+import type { PropsWithChildren } from 'react';
 
 import {
-    SafeAreaView,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    useColorScheme,
-    View,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  useColorScheme,
+  View,
 } from 'react-native';
 
 import {
@@ -34,9 +34,11 @@ const MitraKharisScreen = () => {
 
 
   return (
-    <View>
-        <Text>MitraKharisScreen</Text>
-    </View>
+    <Box flex={1} bgColor="#fff" justifyContent="center">
+      <Center >
+        Halaman Mitra Kharis Belum Tersedia
+      </Center>
+    </Box>
   );
 };
 

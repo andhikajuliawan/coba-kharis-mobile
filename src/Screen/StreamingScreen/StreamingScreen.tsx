@@ -384,7 +384,9 @@ const StreamingScreen = () => {
       headers: { Authorization: `Bearer ${userInfo.token}` },
     })
       .then((response) => response.data)
-      .then((data => setContentPodcast(data.data)))
+      .then((data =>
+        setContentPodcast(data.data)
+      ))
       .catch((err) => {
         console.log(err);
       })
@@ -500,30 +502,31 @@ const StreamingScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {isLoadingYoutube ? <Spinner /> : <ImageBackground source={{ uri: contentYoutube[0].thumbnail }} style={[{ width: '100%', aspectRatio: 16 / 9, justifyContent: 'space-between', flexDirection: 'column', }]} resizeMode='cover' >
-        <LinearGradient colors={['rgba(0, 0, 0, 0.7)', 'transparent']} >
-          <Header />
-        </LinearGradient>
+      {isLoadingYoutube ? <Spinner /> : contentYoutube.length != 0 ?
+        <ImageBackground source={{ uri: contentYoutube[0].thumbnail }} style={[{ width: '100%', aspectRatio: 16 / 9, justifyContent: 'space-between', flexDirection: 'column', }]} resizeMode='cover' >
+          <LinearGradient colors={['rgba(0, 0, 0, 0.7)', 'transparent']} >
+            <Header />
+          </LinearGradient>
 
-        <View style={{ justifyContent: 'center', alignItems: 'center', height: scale(48), width: 'auto', }}>
-          <OpenURLButton url={contentYoutube[0].file}></OpenURLButton>
-        </View>
-        <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.7)']} >
-          <View style={{ flexDirection: 'column', justifyContent: 'space-between', marginHorizontal: scale(15), }}>
-            <View style={styles.live}>
-              <Text style={styles.textLive}>Live Now !</Text>
-            </View>
-            <View>
-              <LimitText text={contentYoutube[0].judul} limit={85} custom={styles.textTitle} />
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              {/* <LimitText text={nowLive.pembicara} limit={40} custom={styles.textSubTitle} /> */}
-              <Text></Text>
-              <Text style={[{ paddingBottom: scale(25) }, styles.textSubTitle]}>{contentYoutube[0].event.tanggal_mulai}</Text>
-            </View>
+          <View style={{ justifyContent: 'center', alignItems: 'center', height: scale(48), width: 'auto', }}>
+            <OpenURLButton url={contentYoutube[0].file}></OpenURLButton>
           </View>
-        </LinearGradient>
-      </ImageBackground>}
+          <LinearGradient colors={['transparent', 'rgba(0, 0, 0, 0.7)']} >
+            <View style={{ flexDirection: 'column', justifyContent: 'space-between', marginHorizontal: scale(15), }}>
+              <View style={styles.live}>
+                <Text style={styles.textLive}>Live Now !</Text>
+              </View>
+              <View>
+                <LimitText text={contentYoutube[0].judul} limit={85} custom={styles.textTitle} />
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                {/* <LimitText text={nowLive.pembicara} limit={40} custom={styles.textSubTitle} /> */}
+                <Text></Text>
+                <Text style={[{ paddingBottom: scale(25) }, styles.textSubTitle]}>{contentYoutube[0].event.tanggal_mulai}</Text>
+              </View>
+            </View>
+          </LinearGradient>
+        </ImageBackground> : <></>}
 
       <View style={styles.content}>
         {/* Search */}
@@ -710,13 +713,13 @@ const StreamingScreen = () => {
         {/* Upcoming Live Streaming */}
         {status === 'Audio Podcast' ? (
           <View>
-            <View style={{ justifyContent: 'flex-start', marginTop: scale(5), marginBottom: scale(15), paddingHorizontal: scale(15), }}>
-              <Text style={styles.textSubMenu}>New Realease</Text>
-            </View>
-            <View style={{ flexDirection: 'column', width: 'auto', marginBottom: scale(15), marginHorizontal: scale(15) }}>
-              {/* New Video */}
-              <ThumbnailNewVideoPodcast urlVideoPodcast={'https://www.youtube.com/watch?v=MLr54_HQavw&ab_channel=TheVillageChurch-FlowerMound'} judulPodcast={'Pemuridan dalam Keluarga / Keluarga yang Memuridkan'} pembicaraPodcast={'Pdt. Nyoman Widiantara'} durasiPodcast={'25:01'} />
-            </View>
+            {/* <View style={{ justifyContent: 'flex-start', marginTop: scale(5), marginBottom: scale(15), paddingHorizontal: scale(15), }}> */}
+            {/* <Text style={styles.textSubMenu}>New Realease</Text> */}
+            {/* </View> */}
+            {/* <View style={{ flexDirection: 'column', width: 'auto', marginBottom: scale(15), marginHorizontal: scale(15) }}> */}
+            {/* New Video */}
+            {/* <ThumbnailNewVideoPodcast urlVideoPodcast={'https://www.youtube.com/watch?v=MLr54_HQavw&ab_channel=TheVillageChurch-FlowerMound'} judulPodcast={'Pemuridan dalam Keluarga / Keluarga yang Memuridkan'} pembicaraPodcast={'Pdt. Nyoman Widiantara'} durasiPodcast={'25:01'} /> */}
+            {/* </View> */}
             <View style={{ justifyContent: 'flex-start', marginTop: scale(5), marginBottom: scale(15), paddingHorizontal: scale(15), }}>
               <Text style={styles.textSubMenu}>New Realease</Text>
             </View>
@@ -885,6 +888,7 @@ const styles = ScaledSheet.create({
     width: '85%',
     fontSize: scale(12),
     fontFamily: 'SF-Pro-Text-Regular',
+    color: "#000"
   },
 
   elevation: {
