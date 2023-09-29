@@ -34,6 +34,7 @@ import StreamingInctive from '../../assets/icons/BottomTab/Streaming_Inactive.sv
 import SplashScreen from '../Screen/SplashScreen';
 
 import SignInScreen from '../Screen/SignInScreen';
+import SignUpScreen from '../Screen/SignUpScreen';
 
 import HomeScreen from '../Screen/HomeScreen';
 import KegiatanScreen from '../Screen/KegiatanScreen';
@@ -83,6 +84,7 @@ const Navigation = () => {
         ) : (
           <>
             <Stack.Screen name="SignIn" component={SignInScreen} />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
           </>
         )}
       </Stack.Navigator>
