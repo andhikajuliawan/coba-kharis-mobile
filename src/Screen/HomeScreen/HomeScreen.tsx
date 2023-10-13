@@ -231,7 +231,7 @@ const HomeScreen = () => {
   };
 
   const getCategories = () => {
-    console.log(userInfo)
+    // console.log(userInfo)
     axios.get(`${BASE_URL}/api/event-categories`, {
       headers: { Authorization: `Bearer ${userInfo.token}` },
     })

@@ -13,6 +13,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
@@ -22,12 +23,15 @@ import Scan from '../../../assets/icons/Header/Scan.svg';
 import Search from '../../../assets/icons/Header/Search.svg';
 import Notification from '../../../assets/icons/Header/Notification.svg';
 import Setting from '../../../assets/icons/Header/Setting.svg';
+import Cart from '../../../assets/icons/Header/cart-white.svg';
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale } from 'react-native-size-matters';
+import { useNavigation } from '@react-navigation/native';
 
 
 const Header = () => {
+  const navigation = useNavigation();
 
 
   return (
@@ -36,11 +40,14 @@ const Header = () => {
         <Scan width={scale(28)} height={scale(28)} />
       </View>
       <View style={styles.space2}>
-        <Search width={scale(28)} height={scale(28)} />
+        {/* <Search width={scale(28)} height={scale(28)} /> */}
+        <TouchableOpacity onPress={() => navigation.navigate('CartList')}>
+          < Cart width={scale(25)} height={scale(25)} />
+        </TouchableOpacity>
         <Notification width={scale(28)} height={scale(28)} />
         <Setting width={scale(28)} height={scale(28)} />
       </View>
-    </View>
+    </View >
   );
 };
 

@@ -1,13 +1,14 @@
-import { Box, Center, Image, HStack, ScrollView, Spinner, Text, Toast } from "native-base"
+import { Box, Center, Image, HStack, ScrollView, Spinner, Text, Toast, Input, Checkbox, Button, AlertDialog, Alert, IconButton, VStack } from "native-base"
 import Header from "../../Component/DetailEvent/Header";
-import { Alert, Dimensions, ImageBackground, Linking, TouchableOpacity, useWindowDimensions } from "react-native"
+import { Dimensions, ImageBackground, Linking, TouchableOpacity, useWindowDimensions } from "react-native"
 import { ScaledSheet } from "react-native-size-matters"
 import { scale } from 'react-native-size-matters';
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { BASE_URL } from "../../config";
 import RenderHTML from "react-native-render-html";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { useNavigation } from "@react-navigation/native";
 
 // SVG
 import Dates from '../../../assets/icons/EventDetail/calendar.svg'
@@ -20,14 +21,26 @@ import { AuthContext } from "../../Context/AuthContext";
 
 
 
-const DetailtEventScreen = ({ route }) => {
+const DetailtEventScreen = ({ route }: { route: any }) => {
     const [eventDetail, setEventDetail] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [latitude, setLatitude] = useState(0);
     const [longitude, setLongitude] = useState(0);
     const [date, setDate] = useState('');
+    const [message, setMessage] = useState('');
+    const [noteMessage, setNoteMessage] = useState('');
+    const [infoDaftar, setInfoDaftar] = useState('');
+    const [isLoadingInfoDaftar, setIsLoadingInfoDaftar] = useState(true);
     const [isLoadingDaftarEvent, setIsLoadingDaftarEvent] = useState(false);
     const { userInfo } = useContext(AuthContext);
+    const navigation = useNavigation();
+    const [listDaftarKeluarga, setListDaftarKeluarga] = useState([]);
+    const [mendaftarKeluarga, setMendaftarKeluarga] = useState(false);
+
+    // Alert Dialog
+    const [isOpen, setIsOpen] = React.useState(false);
+    const onClose = () => setIsOpen(false);
+    const cancelRef = React.useRef(null);
 
 
     const getDetailEvent = () => {
@@ -41,7 +54,6 @@ const DetailtEventScreen = ({ route }) => {
             .then(data => {
                 setEventDetail(data.event_detail);
             })
-
             .then(() => {
                 setLatitude(parseFloat(eventDetail.lat));
                 setLongitude(parseFloat(eventDetail.lng));
@@ -50,7 +62,7 @@ const DetailtEventScreen = ({ route }) => {
                 console.log(err);
             })
             .finally(() => {
-                setIsLoading(false)
+                setIsLoading(false);
             })
     };
 
@@ -60,21 +72,23 @@ const DetailtEventScreen = ({ route }) => {
         axios
             .post(
                 `${BASE_URL}/api/daftar-event`, {
-                event_id: eventDetail.id,
+                event_id: route.params.id,
                 user_id: userInfo.user.id,
+                created_by: userInfo.user.id
             }, {
                 headers: {
                     Authorization: `Bearer ${userInfo.token}`,
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                 },
-            },)
-            .then(response =>
-                // console.log(response.data.message),
-                Toast.show({
-                    description: `${response.data.message}`
-                })
-            )
+            })
+            .then(response => {
+                // Toast.show({
+                //     description: `${response.data.message}`
+                // });
+                setMessage(response.data);
+                setIsOpen(!isOpen);
+            })
             .catch(err => {
                 console.log(err);
             })
@@ -83,18 +97,72 @@ const DetailtEventScreen = ({ route }) => {
             })
     };
 
+    const daftarEventKeluarga = () => {
+        console.log(listDaftarKeluarga);
+        setIsLoadingDaftarEvent(true)
+        for (let index = 0; index < listDaftarKeluarga.length; index++) {
+            var tgl1 = new Date(listDaftarKeluarga[index].tanggal_lahir);
+            var tgl2 = new Date();
+            var timeDiff = Math.abs(tgl2.getTime() - tgl1.getTime());
+            var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            var umur = Math.round(diffDays / 365);
+
+            axios
+                .post(
+                    `${BASE_URL}/api/daftar-event`, {
+                    event_id: eventDetail.id,
+                    user_id: listDaftarKeluarga[index],
+                    umur: umur,
+                    created_by: userInfo.user.id
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${userInfo.token}`,
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => {
+                    // console.log(response.data.message),
+                    Toast.show({
+                        description: `${response.data.message}`
+                    })
+                })
+                .catch(err => {
+                    console.log(err);
+                }).finally(() => {
+                    setIsLoadingDaftarEvent(false)
+                })
+        }
+    };
+    const getInformasiDaftar = () => {
+        axios
+            .get(
+                `${BASE_URL}/api/check-event/event/${route.params.id}/user/${userInfo.user.id}`, {
+                headers: { Authorization: `Bearer ${userInfo.token}` },
+            })
+            .then(response => {
+                setInfoDaftar(response.data.data);
+                setNoteMessage(response.data.message);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+            .finally(() => {
+                setIsLoadingInfoDaftar(false);
+
+            })
+    };
+
     useEffect(() => {
         getDetailEvent();
-
+        getInformasiDaftar();
     }, [])
 
     const description = {
-        html: `
-          ${eventDetail.deskripsi}`
+        html: `${eventDetail.deskripsi}`
     };
     const ketentuan = {
-        html: `
-          ${eventDetail.ketentuan}`
+        html: `${eventDetail.ketentuan}`
     };
 
     const { width } = useWindowDimensions();
@@ -110,10 +178,58 @@ const DetailtEventScreen = ({ route }) => {
     const tagsStyles = {
         body: {
             whiteSpace: 'normal',
-            color: '#555F65'
+            color: '#555F65',
+            textAlign: 'justify'
         },
     };
 
+    const ButtonDaftarKeluarga = () => {
+        if (userInfo.user.ayah_id == null && userInfo.user.ibu_id == null) {
+            return (
+                <>
+                    <Box mt={5} mx={5} >
+                        <Text fontSize={16} mb={2} fontWeight="bold">Daftar List Keluarga</Text>
+                        <Checkbox.Group onChange={setListDaftarKeluarga} value={listDaftarKeluarga}>
+                            {userInfo.user.pasangan != null ?
+                                <Checkbox value={userInfo.user.pasangan.id}>{userInfo.user.pasangan.name}</Checkbox> : <></>
+                            }
+                            {userInfo.anak.length != 0 ? userInfo.anak.map((anak, index) => {
+                                return <Checkbox value={anak.id}>{anak.name}</Checkbox>
+                            }) : <></>}
+                        </Checkbox.Group>
+                    </Box>
+                    <TouchableOpacity onPress={() => daftarEventKeluarga()}>
+                        <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={5} >
+                            <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar Sekarang</Text>
+                        </Box>
+                    </TouchableOpacity>
+                </>
+            )
+        } else {
+            return (<>
+                <Box mt={5} mx={5}>
+                    <Text fontSize={16} mb={2} fontWeight="bold">Daftar List Keluarga</Text>
+                    <Checkbox.Group onChange={setListDaftarKeluarga} value={listDaftarKeluarga}>
+                        {userInfo.eyang.length != 0 ? userInfo.eyang.map((eyang, index) => {
+                            return <Checkbox value={eyang.id}>{eyang.name}</Checkbox>
+                        }) : <></>}
+                        {userInfo.orangtua.length != 0 ? userInfo.orangtua.map((orangTua, index) => {
+                            return <Checkbox value={orangTua.id}>{orangTua.name}</Checkbox>
+                        }) : <></>}
+                        {userInfo.saudara.length != 0 ? userInfo.saudara.map((saudara, index) => {
+                            return <Checkbox value={saudara.id}>{saudara.name}</Checkbox>
+                        }) : <></>}
+                    </Checkbox.Group>
+                </Box >
+                <TouchableOpacity onPress={() => daftarEventKeluarga()}>
+                    <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={5}>
+                        <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar Sekarang</Text>
+                    </Box>
+                </TouchableOpacity >
+            </>)
+        }
+
+    }
     return (
         <ScrollView bgColor="#fff">
             <>
@@ -213,19 +329,39 @@ const DetailtEventScreen = ({ route }) => {
                     </Box>
 
                 </Box>
+
+                {isLoadingInfoDaftar ? <Spinner /> : infoDaftar == 'true' ? <Text mx={5} mt={5} color="#91989F" textAlign="justify" fontSize={12}>note : {noteMessage}</Text> : <></>}
                 {eventDetail.status == 'finish' ?
                     <Box bgColor="#999" borderRadius={50} py={3} mx={5} mt={10}>
                         <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Tutup</Text>
                     </Box>
                     : eventDetail.status == 'canceled' ? <Box bgColor="#999" borderRadius={50} py={3} mx={5} mt={10}>
                         <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Tutup</Text>
-                    </Box> : isLoadingDaftarEvent ? <Spinner /> : <TouchableOpacity onPress={() => daftarEvent()}>
-                        <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={10}>
-                            <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar Sekarang</Text>
-                        </Box>
-                    </TouchableOpacity>}
+                    </Box>
+                        :
+                        isLoadingDaftarEvent ?
+                            <Spinner />
+                            :
+                            eventDetail.tipe_peserta == 2 ? <>
+                                {/* <ButtonDaftarKeluarga /> */}
+                                {mendaftarKeluarga ? <><ButtonDaftarKeluarga /><TouchableOpacity onPress={() => setMendaftarKeluarga(false)}>
+                                    <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={5} mb={10}>
+                                        <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Batal Daftar</Text>
+                                    </Box>
+                                </TouchableOpacity></> : <TouchableOpacity onPress={() => setMendaftarKeluarga(true)}>
+                                    <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={5} mb={10}>
+                                        <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar keluarga</Text>
+                                    </Box>
+                                </TouchableOpacity>}
+                            </>
+                                :
+                                <TouchableOpacity onPress={() => daftarEvent()}>
+                                    <Box bgColor="#032844" borderRadius={50} py={3} mx={5} mt={2} mb={10}>
+                                        <Text color="#fff" textAlign="center" fontWeight="bold" fontSize={16} >Daftar Sekarang </Text>
+                                    </Box>
+                                </TouchableOpacity>}
 
-                <Box m={5}>
+                <Box mx={5} mb={20}>
                     <Text fontWeight="bold" color="#555F65" fontSize={16} >Ketentuan Peserta</Text>
                     <RenderHTML
                         contentWidth={width}
@@ -233,6 +369,29 @@ const DetailtEventScreen = ({ route }) => {
                         tagsStyles={tagsStyles}
                     />
                 </Box>
+                <Center>
+                    <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen} onClose={onClose}>
+                        <AlertDialog.Content>
+                            <AlertDialog.CloseButton />
+                            <AlertDialog.Header><Text></Text></AlertDialog.Header>
+                            <AlertDialog.Body>
+                                <Text>
+                                    {message.message}
+                                </Text>
+                            </AlertDialog.Body>
+                            <AlertDialog.Footer >
+                                <Box width="100%">
+                                    <TouchableOpacity >
+
+                                        <Button bgColor="#003459" onPress={() => navigation.navigate('CartList')}>
+                                            <Text color="#fff">CheckOut</Text>
+                                        </Button>
+                                    </TouchableOpacity>
+                                </Box>
+                            </AlertDialog.Footer>
+                        </AlertDialog.Content>
+                    </AlertDialog>
+                </Center>
             </>
         </ScrollView >
 

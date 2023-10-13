@@ -46,17 +46,19 @@ import DetailEventListScreen from '../Screen/DetailEventListScreen';
 import DetailEventScreen from '../Screen/DetailEventScreen';
 import DetailKegiatanListScreen from '../Screen/DetailKegiatanListScreen';
 import DetailGroupListScreen from '../Screen/DetailGroupListScreen';
+import CartListScreen from '../Screen/CartListScreen';
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 
-import {AuthContext} from '../Context/AuthContext';
+import { AuthContext } from '../Context/AuthContext';
+import CartDetailScreen from '../Screen/CartDetailScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
-  const {userInfo, splashLoading} = useContext(AuthContext);
+  const { userInfo, splashLoading } = useContext(AuthContext);
 
   const [HideSplash, setHideSplash] = useState(true);
 
@@ -80,6 +82,8 @@ const Navigation = () => {
             <Stack.Screen name="DetailEvent" component={DetailEventScreen} />
             <Stack.Screen name="DetailKegiatanList" component={DetailKegiatanListScreen} />
             <Stack.Screen name="DetailGroupList" component={DetailGroupListScreen} />
+            <Stack.Screen name="CartList" component={CartListScreen} />
+            <Stack.Screen name="CartDetail" component={CartDetailScreen} />
           </>
         ) : (
           <>
