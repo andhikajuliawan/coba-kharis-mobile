@@ -37,7 +37,10 @@ const Header = () => {
   return (
     <View style={styles.container}>
       <View style={styles.space1}>
-        <Scan width={scale(28)} height={scale(28)} />
+        <TouchableOpacity onPress={() => navigation.navigate('QrCodeReader')}>
+          <Scan width={scale(28)} height={scale(28)} />
+
+        </TouchableOpacity>
       </View>
       <View style={styles.space2}>
         {/* <Search width={scale(28)} height={scale(28)} /> */}

@@ -47,6 +47,7 @@ import DetailEventScreen from '../Screen/DetailEventScreen';
 import DetailKegiatanListScreen from '../Screen/DetailKegiatanListScreen';
 import DetailGroupListScreen from '../Screen/DetailGroupListScreen';
 import CartListScreen from '../Screen/CartListScreen';
+import QrCodeReaderScreen from '../Screen/QrCodeReaderScreen';
 
 import { ScaledSheet } from 'react-native-size-matters';
 import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
@@ -84,6 +85,7 @@ const Navigation = () => {
             <Stack.Screen name="DetailGroupList" component={DetailGroupListScreen} />
             <Stack.Screen name="CartList" component={CartListScreen} />
             <Stack.Screen name="CartDetail" component={CartDetailScreen} />
+            <Stack.Screen name="QrCodeReader" component={QrCodeReaderScreen} />
           </>
         ) : (
           <>
